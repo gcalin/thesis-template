@@ -10,7 +10,7 @@ several formidable challenges, the scope of which is perhaps best exemplified
 by \citet{hoare2003verifying}
 declaring the task of building a provably correct compiler to be a 
 \textit{Grand Challenge} in computing research.
-Researchers and practitioners have invested tremendous resources
+Researchers and practitioners have invested tremendous amounts of resources
 into compiler research in recent decades, attempting to improve
 performance, quality, and reliability. 
 Such efforts are especially beneficial for newer software systems,
@@ -22,21 +22,22 @@ as worthy alternatives to mature standards.
 
 Because of their cornerstone role in many critical applications,
 compilers are often subject to thorough quality assurance processes.
-A significant portion of research focuses on testing as a means
+Many research directions incorporate testing as a means
 of assessing and improving the correctness of compilers.
-Empirical evidence has spotlighted the necessity of such approaches,
+Empirical evidence supports the benefits of such approaches,
 with \citet{sun2016toward} and \citet{holler2012fuzzing} highlighting
 the existence of bugs in widely used C compilers and JavaScript engines, respectively. 
-These findings stand out particularly because of the maturity of the
-software ecosystems that pivot around these technologies and showcases
-the necessity of effective and adaptable testing methods.
+These findings stand out because of the maturity of the
+software ecosystems that pivot around these technologies, showcasing
+the necessity of effective testing methods.
 
 One approach to testing compilers is to assemble manually-written test suites.
 This strategy has several advantages, including the possibility to individually
 target specific components of the compiler and the developer's ability to
-reason about the tests' semantics and expected outputs. However, the labor-intensive
-nature of the process and the imposing complexity of compiler code bases have
-led to test case generation methods superseding their 
+reason about the tests' semantics and expected outputs.
+However, the labor-intensive nature of this process and 
+the imposing complexity of compiler code bases have
+led to automated test case generation methods superseding their 
 manual counterparts \citep{chen2020survey, zhao2009automated}.
 Though compelling and time-effective, automated test case
 generation strategies concurrently give rise to an arduous set of challenges.
@@ -55,7 +56,7 @@ have the ability to generate novel test programs, which in turn may contain
 seldom encountered constructs and relations.
 By contrast, mutation-centric approaches such as those put forward by 
 \citet{le2014compiler, le2015finding, sun2016finding}, and \citet{stepanov2021type}
-rely on an input (often called the seed) that serves as a basis for subsequent transformations.
+rely on an input or seed program, that serves as a basis for subsequent transformations.
 While the former approach may be able to explore more of the
 space of feasible input programs, the latter effectively leverages
 large corpora that become available as programming language
@@ -69,7 +70,7 @@ Initially designed as a Java alternative, the Kotlin
 ecosystem has steadily grown and currently envelops
 a broad range of use-cases, including server-side development,
 web front-end interfaces, and mobile applications. 
-Kotlin showcases several compelling attributes, including expressiveness,
+Kotlin showcases several compelling features, including expressiveness,
 safety, and interoperability, which have played a key role in Google embracing
 a "Kotlin-first" approach in its popular Android mobile operating system \cite{kotlinfirst}.
 
@@ -161,8 +162,8 @@ fuzzing heuristics at uncovering bugs in the Kotlin compiler?}
 \end{quote}
 
 A vital point to consider when designing a fuzzing algorithm is
-its potential to adapt to the goals of its users.\textbf{•}
-TODO show that any random testing approach eventually reaches a
+its potential to adapt to the goals of its users. \citet{amalfitano2015exploiting}
+show that random testing approaches eventually reach a
 saturation point, where novel input is exceedingly unlikely to trigger
 detecting new faults. 
 To combat this, practitioners can either design new tools, adapt existing
@@ -184,8 +185,8 @@ bugs in the Kotlin compiler?}
 \section{Contributions and Significance}
 
 This thesis makes both theoretical and practical advances,
-relevant to both the field of compiler testing and the 
-Kotlin practitioner community. To summarize, we expect this
+relevant to both the field of compiler testing and to the 
+Kotlin community. To summarize, we expect this
 study to result in the following contributions:
 
 \begin{enumerate}

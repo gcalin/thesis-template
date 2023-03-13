@@ -33,7 +33,7 @@ complex and feature-rich tools.
 
 \newacronym{JVM}{JVM} {Java Virtual Machine}
 
-Though it supports several platforms, the Kotlin ecosystem pivots around
+Though it supports several platforms, large portions of the Kotlin ecosystem pivots around
 the \Gls{JVM} system and its adjacent Java bytecode instruction set.
 Kotlin is one of several successful languages to leverage the \gls{JVM},
 together with Java, Scala, Clojure, and Groovy. 
@@ -45,7 +45,7 @@ Leveraging the \gls{JVM} as an intermediate compilation step,
 language designers can focus on building a single compilation tool
 that targets Java bytecode.
 This approach delegates the task of machine code
-generation to the \gls{JVM} and frees co12mpiler engineers from
+generation to the \gls{JVM} and frees compiler engineers from
 platform- and hardware-specific idiosyncrasies.
 This study focuses on testing the end-to-end compilat1ion pipeline
 of Kotlin through the open-source \texttt{kotlinc} utility.
@@ -97,7 +97,7 @@ generally small and automatically executable tests that aim
 to validate the correctness of small components (units) of the \gls{SUT}.
 \citet{leung1990study} establish \gls{IT} at a higher-level scope, targeting
 the integration of several smaller modules within a system.
-Finally, \citet{umar2020comprehensive} identify \gls{ST} as tests
+Finally, \citet{umar2020comprehensive} identifies \gls{ST} as tests
 that validate the entire system's compliance against its underlying
 requirements.
 
@@ -106,7 +106,7 @@ requirements.
 Irrespective of access to the \gls{SUT}
 and its level of granularity, test cases must be capable
 of distinguishing between correct and faulty behavior.
-This challenge and is referred to as the 
+This challenge constitutes
 \textit{test oracle problem}, and its automation is among the 
 greatest obstacles in automating test case generation \citep{barr2014oracle}.
 Approaches like specification inference and regression testing offer
@@ -156,9 +156,9 @@ This original formulation of fuzzing bears a close
 resemblance to well established test case generation algorithms
 such as \Gls{RT} \cite{duran1981report} and 
 its descendant, \Gls{ART} \cite{chen2010adaptive}.
-Nonetheless, its simplicity and deceptive effectiveness
-as a defect discovery tool led to fuzzing becoming one
-of the most prevalent input and test case generation techniques.
+Nonetheless, fuzzing is a straight-forward and deceptively effective 
+tool for defect discovery, which led it to become one
+of the most prevalent techniques in the field of test case generation.
 
 Since its inception, the meaning of fuzzing has adapted to
 better accommodate the extensive domain of applications that

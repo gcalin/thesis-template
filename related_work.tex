@@ -6,7 +6,7 @@ Section \ref{sec:compiler_testing} examines existing
 automated compiler testing tools and their underlying rationale.
 Section \ref{sec:specification_fuzzing} surveys algorithms
 for specification fuzzing, a problem whose elemental challenges
-share many commonalities with of compiler testing. 
+share many commonalities with compiler testing. 
 
 \section{\label{sec:compiler_testing}Automated Compiler Testing}
 
@@ -55,7 +55,7 @@ a given linguistic syntax.
 
 \citet{purdom1972sentence} devised one of the first algorithms aimed at
 validating the validity of \gls{CFG} parsers.
-The grammar-direct approach applies iterative rewriting rules
+This grammar-direct approach applies iterative rewriting rules
 starting from a starting symbol, eventually reaching all grammar productions.
 The algorithm heuristically favors short sentences, that aid in the
 debugging of uncovered faults.
@@ -104,9 +104,9 @@ Once established, the generated types drive the creation of global variables
 that can be used in future statements.
 \textsc{YARPGen} incrementally builds functions that utilize 
 the previously generated types and symbols.
-Each expression in a statement is recursively constructed by a
-\Gls{UB}.
-To further increase the soundness of its program, \textsc{YARPGen}
+Each expression in a statement is recursively constructed 
+such that it avoids \Gls{UB}.
+To further increase the soundness of its output, \textsc{YARPGen}
 performs local fixes that eliminate several common \gls{UB} instances.
 Finally, \textit{generation policies} provide a mechanism
 for adapting the probability distribution dictating
