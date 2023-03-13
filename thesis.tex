@@ -1,4 +1,4 @@
-\documentclass[twoside,a4paper,11pt]{memoir}
+\documentclass[twoside,a4paper,11pt,openany]{memoir}
 \usepackage{a4}
 \usepackage{times}
 \usepackage{pslatex}
@@ -9,23 +9,37 @@
 % %% The package 'algorithm' is useful, but incompatible with memoir.
 % %% Cor-Paul Bezemer / http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
 % %% suggest the following fix:
-\let\newfloat\undefined \usepackage{algorithmic} 
-\usepackage{algorithm}
+%\let\newfloat\undefined \usepackage{algorithmic} 
+%\usepackage{algorithm}
 
 % Include right (LaTeX/PDFLaTeX) graphics package
 % (doesn't work under cygwin apperently)
 %\ifx\pdftexversion\undefined
 \usepackage[dvips]{graphicx}
 \usepackage[dvips]{color}
+
+\usepackage{parskip}
+\setlength{\parskip}{0pt}
 %\else
 %\usepackage[pdftex]{graphicx}
 %\usepackage[pdftex]{color}
 %\fi
 
 \usepackage{hyperref}
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\setglossarysection{chapter}
 
 % Used in the bibliography to enable \citeauthor{citation}
 \usepackage[numbers]{natbib}
+%\usepackage{algpseudocode,algorithm,algorithmicx}
+%\usepackage{algpseudocode}
+%\usepackage{algorithm} 
+%\usepackage{algorithmicx}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\newcommand*\DNA{\textsc{dna}}
+
+\newcommand*\Let[2]{#1 $\leftarrow$ #2}
 
 % Ensure that urls longer than the page width are broken up
 % Based on the answer of StackOverflow user "xamde":
@@ -37,6 +51,7 @@
   \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
   \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
   \do\Y\do\Z}
+  
 
 %---------------------------------------------------------------------%
 %                     Options                                         %    
@@ -92,6 +107,8 @@ ThePlace, the Netherlands\\
 \maxsecnumdepth{subsection}
 
 \begin{document}
+
+
 \frontmatter
 \thispagestyle{empty}
 \maketitle                                      % for the cover page
@@ -102,10 +119,14 @@ ThePlace, the Netherlands\\
 \cleardoublepage\tableofcontents
 \cleardoublepage\listoffigures
 \cleardoublepage\mainmatter
-
 \include{introduction} 
-\include{chapter} 
+\include{background} 
 \include{related_work} 
+\include{algorithm}
+\include{tool}
+\include{empirical_study}
+\include{results}
+\include{discussion}
 \include{conclusions_and_future_work} 
 
 \bibliographystyle{plainnat}
@@ -114,6 +135,9 @@ ThePlace, the Netherlands\\
 \appendix
 \def\chaptername{Appendix}
 \include{appendix}
+
+
+
 \include{requirements}
 
 
