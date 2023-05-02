@@ -1,2 +1,310 @@
 \addcontentsline{toc}{part}{Part II}
-\chapter{\label{cha:algorithm}Algorithm}
+\chapter{\label{cha:algorithm} Program-Based Fuzzing for the Kotlin Compiler}
+
+This chapter details the foundational techniques, abstractions,
+and trade-offs that our novel approach employs to generate syntactically
+valid and semantically meaningful Kotlin code.
+
+\section{\label{sec:context}Semantic Interface}
+
+Kotlin is a rich programming language, that conjoins various
+paradigms, each building upon numerous layers of
+theoretical abstractions.
+These abstractions collectively govern the semantics
+of the language, and implicitly determine the validity of programs.
+We jointly represent the core concepts that compose the Kotlin
+semantics under an overarching concept called the fuzzer's \textit{context}.
+
+The context contains both adaptive, program-specific details (such as scopes and
+visible identifiers), and universally applicable statues (such as type hierarchies).
+The information encapsulated in the context drives the generative
+process, similarly to \textsc{YARPGen} \cite{manes2019art}.
+However, unlike \textsc{YARPGen}, we endow our representation of the context
+with an extraction feature that allows the parsing of arbitrary
+Kotlin code to serve as the basis of further generation. 
+The remainder of this section describes TODO key features of the context.
+
+\newacronym{DAG}{DAG} {Directed Acyclic Graph}
+
+\subsection{\label{subsec:type-hierarchy}Type Hierarchy Representation}
+
+Kotlin is a strongly-typed language, with well-formed semantics
+that are crucial for generating valid code snippets.
+We represent these the Kotlin type system using a labeled \Gls{DAG} data structure.
+Formally, a \Gls{DAG} $G$ is a tuple $\langle V, E \rangle$ composed
+of a set of vertices $V$ and a function $E : (V \times V) \to L^{+}$ that
+each link pairs of vertices in $V$ through a composite transition from a domain $L$.
+
+The set $V$ comprises all the accessible classifier types
+(i.e., (abstract) classes, interfaces) in the environment.
+The function $E$ maps each pair of vertices $\langle u, v \rangle$ with $u, v \in V$
+to a label $l \in L = \{ \emptyset, >, \epsilon \} \cup V$, where the label signifies
+the inheritance relation between the two types.
+A $\emptyset$ transition signals that there is no direct relation between types, while
+a $>$ transitions symbolizes that $v$ is a direct and unparameterized subtype of $u$.
+To accommodate the semantics of parameterized types, we enrich the label set $L$
+with all types belonging to $V$, as well as an additional symbol $\epsilon$.
+A label belonging to $V$ signifies that one of the parameterized types of $u$
+explicitly belongs to a type hierarchy, while the $\epsilon$ transition represents
+the inheritance of a symbolic type.
+
+\begin{figure}
+    \centering
+	\begin{tikzpicture}
+	\begin{scope}[every node/.style={circle,thick,draw} ]
+		\node[minimum size=75pt] (D) at (5,4) {\texttt{Any}};
+    		\node[minimum size=75pt] (A) at (0,0) {\texttt{Number}};
+    		\node[minimum size=75pt] (B) at (5,0) {\texttt{Comparable$<$E$>$}};
+    		\node[minimum size=75pt] (C) at (2.5,-5) {\texttt{Double}};
+    		\node[minimum size=75pt] (E) at (10,0) {\texttt{Iterable$<$E$>$}};
+    		\node[minimum size=75pt] (F) at (10,-5) {\texttt{Collection$<$E$>$}};
+	\end{scope}
+	\begin{scope}[>={Stealth[black]},
+              every node/.style={fill=white,circle},
+              every edge/.style={draw=black,very thick}]
+    		\path [->] (B) edge node {$\texttt{Double}$} (C);
+    		\path [->] (A) edge node {$>$} (C);
+    		\path [->] (D) edge node {$>$} (A);
+	    	\path [->] (D) edge node {$>$} (B);
+    		\path [->] (D) edge node {$>$} (E);
+    		\path [->] (E) edge node {$\epsilon$} (F);
+%    \path [->] (B) edge[bend right=60] node {$1$} (E); 
+	\end{scope}
+	\end{tikzpicture}
+    \caption{A sample of the type hierarchy representation using standard Kotlin types.}
+    \label{fig:type-hierarchy}
+\end{figure}
+
+
+\autoref{fig:type-hierarchy} depicts the \Gls{DAG} representation
+a small subset of built-in and standard Kotlin types.
+Within this hierarchy, the \texttt{Number}, \texttt{Comparable$<$E$>$}, 
+and \texttt{Iterable$<$E$>$} types all directly inherit from the \texttt{Any} node, 
+the root of the type hierarchy.
+The \texttt{Number} and \texttt{Comparable$<$E$>$} have a common immediate descendant in the 
+\texttt{Double} type, though their transitions differ.
+The transition between \texttt{Comparable$<$E$>$} and \texttt{Double} itself
+contains the annotation \texttt{Double}, an exact type referring to a node in the graph
+that is required to complete the inheritance.
+The $\epsilon$ label on the edge between \texttt{Iterable$<$E$>$} and \texttt{Collection$<$E$>$}
+denotes that \texttt{E} is a symbolic type, and that a link between the two parameterized types
+must be consistent.
+The meaning of consistency can be vary, as parameterized types in Kotlin may contain bounds -
+the labels store this information as the graph is constructed and enforce it when the fuzzer 
+queries the context representation at runtime.
+
+This representation of types offers several key advantages within the scope of the fuzzer.
+First, a graph representation is flexible in that new types can easily be added, removed, or changed
+during fuzzing.
+This flexibility also enables automating the construction of a type hierarchy
+from pre-written Kotlin files, which in turn allows for near-endless customization of the fuzzing space.
+Second, a \Gls{DAG} topology enables the encoding of strict semantic constraints into
+graph-centric problems.
+This simple inheritance semantics (i.e., subclasses may be used wherever a superclass is expected),
+but can also generalize to Kotlin-specific traits, such as requiring children of the \texttt{Iterable$<$E$>$}
+node whenever a \texttt{for} loop occurs.
+Finally, the \Gls{DAG} greatly prunes the search space of semantically valid solutions, as simple graph walking
+algorithms suffice to solve problems related to sound parameterized type inference, a common problem
+when fuzzing the Kotlin standard library.
+
+\subsection{\label{subsec:callables}Callable Representation}
+In addition to a type hierarchy, the fuzzer uses knowledge to which \textit{callables}
+it can act upon.
+We use the term callable in a similar fashion to \citet{stepanov2021type}, with this term encompassing
+the set of functions, methods, constructors, variables, constants, and predefined primitive values
+available to the fuzzer.
+We model each callable as a 5-tuple $\langle N, O, P, I, R \rangle$ that builds on top of the
+type hierarchy.
+Let $N$ the name of the callable, $O$ the type of the callable's \textit{owner} class,
+$P$ a list of (symbolic) parameterized types specific to the callable,
+$I$ a list of input types that the callable requires,
+and $R$ the return (or output type) of the callable.
+This representation draws inspiration from lambda calculus and aims to provide a uniform representation
+for all callables that Kotlin can represent.
+
+\lstset{
+  basicstyle=\footnotesize, frame=tb,
+  xleftmargin=.2\textwidth, xrightmargin=.2\textwidth,
+  numbers=left, stepnumber=1,
+}
+
+\begin{figure}
+\begin{lstlisting}[language=Kotlin]
+class Foo <E>(bar: String, baz: E) {
+    val fooProp1: String = bar
+    var fooProp2: E = baz
+    fun <P> fooFunc(parameter: P) : E {
+        return fooProp2
+    }
+}
+\end{lstlisting}
+\caption{Simple Kotlin snippet.}
+\label{fig:callables}
+\end{figure}
+
+To help build intuition on the applicability of this representation,
+consider the snippet depicted in \autoref{fig:callables}.
+Though simple, the \texttt{Foo} class contains several representationally
+challenging constructs that help illustrate the capability of the callable construct.
+First, the \texttt{Foo$<$E$>$} type itself belongs to the type hierarchy
+of the underlying context. 
+The \texttt{fooProp1} class property becomes the
+$\langle \texttt{fooProp1},$ \texttt{Foo$<$\texttt{E}$>$} $, \emptyset, \emptyset, \texttt{String} \rangle$
+quintuple, which is akin to a lambda-calculus function that takes no input and returns a \texttt{String} value.
+The \texttt{fooProp2} property is analogous, with the exception of the return type,
+which is now a symbolic type \texttt{E}, which is linked to the owner class' parameter type.
+During runtime, the fuzzer leverages this link to first determine other contextual constraints
+on \texttt{E}, and then sample an appropriate concrete type to fulfill the link.
+
+Finally, the \texttt{fooFunc} method becomes the 
+$\langle \texttt{fooFunc},$ \texttt{Foo$<$\texttt{E}$>$} $,
+\{ \texttt{P} \}, \{ \texttt{E} \}, \texttt{String} \rangle$
+5-tuple, which links both parameter's input type to the method's
+own parameterized type \texttt{P} and the return type to the 
+class' parameterized type \texttt{E}.
+A similar translation occurs for the primary constructor of \texttt{Foo},
+which becomes the 
+$\langle \texttt{Foo}, \bot, \{ \texttt{E} \}, 
+\{ \texttt{String}, \texttt{E} \},$ \texttt{Foo$<$\texttt{E}$>$} $\rangle$
+quintuple that takes two inputs and returns an object of type \texttt{Foo$<$E$>$}.
+In the latter case, the constructor's owner class is left out,
+a constructor call does not require access to an object.
+
+\subsection{\label{subsec:context-extraction}Context Extraction}
+
+To achieve the desired utility, the context representation
+must be capable of two fulfilling two core tasks.
+First, it should contain sufficient information to enable a fuzzer to generate valid Kotlin
+code through successive queries.
+Second, it should be flexible enough to support the \textit{extraction} of relevant types
+and callables from pre-existing pieces code, without requiring the user to manually
+intervene in the process.
+The latter requirement drastically increases the applicability of such a tool in
+the real world, where practitioners might want to investigate particular language features,
+specific implementations of standard interfaces, or proprietary 
+code bases. To accomplish this, we developed a three-phase context extraction
+process that parses a collection of input Kotlin files and produced a
+sound representation using the type hierarchy and callable abstractions.
+\autoref{fig:context-extraction} depicts this method.
+
+\def\layersep{0.5}
+\def\nodesep{0.5}
+
+\begin{figure*}[!hbtp]
+\vspace{2cm}
+\centering
+\begin{minipage}[t]{-4\linewidth}
+\begin{tikzpicture}[transform canvas={scale=1.0},node/.style={circle, draw, thick}]
+
+\foreach \Z in {0,0.5,1,1.5}
+ {\draw[fill=gray,draw=black] (-6,0,\Z) rectangle (-5.25,1,\Z);}
+
+\node[] at (-5.5,1.5)   (a) {Input Files};
+
+ \draw [-stealth] (-5, 0.5) -- node[pos=0.5,above]{Parsing} (-3.5, 0.5);
+ 
+ \pgfmathsetmacro{\cubex}{1}
+\pgfmathsetmacro{\cubey}{1}
+\pgfmathsetmacro{\cubez}{1}
+
+\node[node] (pt1) at (-3,1,0) {};
+\node[node] (pt2) at (-3,0.5,0) {};
+\node[node] (pt3) at (-3,0,0) {};
+
+\path[-stealth, thick] (pt1) edge (pt2);
+\path[-stealth, thick] (pt2) edge (pt3);
+
+\node[node] (pt5) at (-2.5,1,0) {};
+\node[node] (pt6) at (-2.5,0.5,0) {};
+\node[node] (pt7) at (-2.5,0,0) {};
+
+\path[-stealth, thick] (pt5) edge (pt6);
+\path[-stealth, thick] (pt6) edge (pt7);
+
+\node[] at (-2.75,1.875)   (a) {Parse trees};
+
+\draw [-stealth] (-2, 0.5) -- node[pos=0.5,above]{Traversal} (-0.5, 0.5);
+
+\draw[black,fill=gray] (0.75,1,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black,fill=gray] (0.75,1,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) --  cycle;
+\draw[black,fill=gray] (0.75,1,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+
+\node[] at (0.5,1.875)   (a) {IR};
+
+\draw [-stealth] (1.25, 0.5) -- node[pos=0.5,above]{Sorting} (3.25, 0.5);
+
+  \foreach \y in {1,...,3}{
+      \node[node] (i\y) at (3.75,\nodesep*\y-0.5) {};
+      \node[node, right=\layersep of i\y] (h1\y) {};
+      \node[node, right=\layersep of h1\y] (h2\y) {};
+    }
+
+  \foreach \source in {1,...,3}
+  \foreach \dest in {1,...,3}{
+      \path[-stealth, thick] (i\source) edge (h1\dest);
+      \path[-stealth, thick] (h1\source) edge (h2\dest);
+    }
+
+\draw[] (3.35, -0.5) rectangle (5.85, 1.5);
+
+\node[] at (4.6,1.875)   (a) {Type DAG};
+
+
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%% Bottom half
+\draw [-stealth] (0.5, -0.25) -- (0.5, -2) -- (1.3, -2);
+\draw [-stealth] (4.6, -0.55) -- (4.6, -2) -- (3.15, -2);
+
+\draw[black,fill=gray] (2.55,-1.5,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black,fill=gray] (2.55,-1.5,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) --  cycle;
+\draw[black,fill=gray] (2.55,-1.5,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+
+\node[] at (2.3,-3)   (a) {Callables};
+
+
+\end{tikzpicture}
+\end{minipage}
+\vspace{3.5cm}
+\caption{Simplified visualization the context extraction process.}
+\label{fig:context-extraction}
+\end{figure*}
+
+The extraction process operates on a parsed representation of the input
+files, which for the scope of this research consisted of built-in and standard library 
+Kotlin files.
+The first phase consists of traversing the parse trees of the Kotlin files and mapping
+relevant information into an intermediate representation.
+The retained information includes the necessary details to identify language constructs,
+available types, and relations between parameterized types.
+The second step then creates the links between 
+parameterized types in class declarations and their properties, while simultaneously
+traversing the intermediate representation and inserting metadata with regarding
+visibility and inheritance modifiers.
+
+The third step of the procedure involves building the type hierarchy \Gls{DAG}.
+At this point, extracted class definitions contain links that allow for the
+differentiation between symbolic and concrete types, which makes resolving
+inheritance relations possible.
+Because of this, a simple topological sorting algorithm suffices to construct the \Gls{DAG}.
+An initial \texttt{Any} node serves as the root of the graph
+and represents the parent for all classifiers
+that do not explicitly inherit from other constructs.
+This design choice simplifies the application of further graph traversal algorithms.
+The topological sorting then proceeds by filtering available parsed classifiers on three conditions: (i) that the direct parents of the classifier have been added to the hierarchy, (ii) that the concrete parameterized types of the classifier have been added to the hierarchy, and (iii) that the owner
+type of the classifier has been added to the hierarchy (if nested types are encountered).
+Classifiers that meet these requirements can be added in an arbitrary order.
+The algorithm then proceeds until all visible classifier types have been processed.
+This stopping condition places the burden of selecting a sound
+subset of input files on the user, but we provide sensible
+default values to alleviate this problem.
+
+Once a type hierarchy has been established, the final step creates links between the
+processed types and the relevant callables.
+Each intermediate representation of a callable receives a copy of its owner's type
+before being converted into its final representation, which enables conversion to
+valid Kotlin code.
+The context tracks each callable by its owner's type, with a special empty owner for built-in 
+functions.
+This method of storage not only models the intuitive structure of \Gls{OO} code 
+(with container classes and their properties), but decreases the complexity of
+common queries during runtime.
+

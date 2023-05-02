@@ -3,8 +3,11 @@
 \usepackage{times}
 \usepackage{pslatex}
 \usepackage{url}
+\usepackage{amsmath,amsfonts,amssymb}
 \usepackage{mscthesis}
 \usepackage{lipsum} % standard filler text, only needed for demo
+\usepackage{tikz,pgffor}
+\usetikzlibrary{positioning,shapes.arrows,arrows.meta,shadows}
 
 % %% The package 'algorithm' is useful, but incompatible with memoir.
 % %% Cor-Paul Bezemer / http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
@@ -15,8 +18,77 @@
 % Include right (LaTeX/PDFLaTeX) graphics package
 % (doesn't work under cygwin apperently)
 %\ifx\pdftexversion\undefined
-\usepackage[dvips]{graphicx}
-\usepackage[dvips]{color}
+%\usepackage[dvips]{graphicx}
+%\usepackage[dvips]{color}
+%\usepackage{xcolor,pifont}
+
+%\usepackage[dvipsnames]{xcolor}
+\colorlet{gray1}{gray!40!black}
+\colorlet{gray2}{gray!80!black}
+\usepackage{listings}
+
+\tikzset{XOR/.style={draw,circle,append after command={
+        [shorten >=\pgflinewidth, shorten <=\pgflinewidth,]
+        (\tikzlastnode.north) edge (\tikzlastnode.south)
+        (\tikzlastnode.east) edge (\tikzlastnode.west)
+        }
+    }
+}
+\tikzset{line/.style={draw, -latex',shorten <=1bp,shorten >=1bp}}
+
+\lstdefinelanguage{Kotlin}{
+  comment=[l]{//},
+  commentstyle={\color{gray}\ttfamily},
+  emph={filter, first, firstOrNull, forEach, lazy, map, mapNotNull, println},
+  emphstyle={\color{OrangeRed}},
+  identifierstyle=\color{black},
+  keywords={!in, !is, abstract, actual, annotation, as, as?, break, by, catch, class, companion, const, constructor, continue, crossinline, data, delegate, do, dynamic, else, enum, expect, external, false, field, file, final, finally, for, fun, get, if, import, in, infix, init, inline, inner, interface, internal, is, lateinit, noinline, null, object, open, operator, out, override, package, param, private, property, protected, public, receiveris, reified, return, return@, sealed, set, setparam, super, suspend, tailrec, this, throw, true, try, typealias, typeof, val, var, vararg, when, where, while},
+  keywordstyle={\color{NavyBlue}\bfseries},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[s]{"""*}{*"""},
+  ndkeywords={@Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic, Array, Byte, Double, Float, Int, Integer, Iterable, Long, Runnable, Short, String, Any, Unit, Nothing},
+  ndkeywordstyle={\color{BurntOrange}\bfseries},
+  sensitive=true,
+  stringstyle={\color{ForestGreen}\ttfamily},
+}
+
+
+% Colors
+% Corporate colors
+\definecolor{tudCyan}{RGB}{61,152,222}
+\definecolor{tudBlack}{RGB}{0,0,0}
+\definecolor{tudWhite}{RGB}{255,255,255}
+\definecolor{BurntOrange}{RGB}{204,85,0}
+\definecolor{NavyBlue}{RGB}{0,0,128}
+
+% Basic colors
+\definecolor{tudSeaGreen}{RGB}{111,189,165}
+\definecolor{tudGreen}{RGB}{39,131,142}
+\definecolor{tudDarkBlue}{RGB}{34,70,122}
+\definecolor{tudPurple}{RGB}{36,46,131}
+\definecolor{tudTurquoise}{RGB}{50,154,179}
+\definecolor{tudSkyBlue}{RGB}{130,187,206}
+
+% Accent colors
+\definecolor{tudLavender}{RGB}{121,150,180}
+\definecolor{tudOrange}{RGB}{216,130,62}
+\definecolor{tudWarmPurple}{RGB}{110,50,122}
+\definecolor{tudFuchsia}{RGB}{178,72,146}
+\definecolor{tudBrightGreen}{RGB}{183,200,34}
+\definecolor{tudYellow}{RGB}{247,234,151}
+
+\definecolor{customBlockColor}{RGB}{200,228,250}
+\definecolor{customAlertColor}{RGB}{31,112,173}
+
+\definecolor{myblue}{rgb}{0.29,0.5,0.74}
+\definecolor{myred}{rgb}{0.73,0.32,0.3}
+\definecolor{mygreen}{rgb}{0.59,0.73,0.34}
+\definecolor{myviolet}{rgb}{0.49,0.39,0.62}
+\definecolor{myturquoise}{rgb}{0.28,0.67,0.76}
+\definecolor{myorange}{rgb}{0.97,0.58,0.27}
+\usepackage{chngcntr}
+\counterwithin{figure}{section}
 
 \usepackage{parskip}
 \setlength{\parskip}{0pt}
@@ -107,8 +179,6 @@ ThePlace, the Netherlands\\
 \maxsecnumdepth{subsection}
 
 \begin{document}
-
-
 \frontmatter
 \thispagestyle{empty}
 \maketitle                                      % for the cover page
