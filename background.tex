@@ -18,7 +18,7 @@ required for the analysis of related work examined in Chapter \ref{cha:related}.
 %}
 %\Gls{formula}
 The Kotlin project began in 2010, with version \texttt{1.0} releasing
-in 2016 \citep{stepanov2021type}.
+officially releasing six years later \citep{stepanov2021type}.
 Following Google's decision to support it as an official Android
 programming language \cite{kotlin5years}, Kotlin's popularity increased drastically.
 This exceptional growth is perhaps best exemplified through
@@ -30,6 +30,27 @@ to $9.16$ per cent in 2022 \citep{sosurvey2016, sosurvey2022}.
 Such sustained growth brought both opportunities and challenges to the
 expanding community, which resulted in the development of increasingly
 complex and feature-rich tools.
+
+Such changes have not gone unnoticed by Kotlin developer
+community, who for the past seven years has introduced numerous
+changes to all parts of the language ecosystem to
+accommodate changes in the scope of the language.
+Inevitably, the compiler too must adapt to the adjustment
+in direction that the ecosystem is subject to.
+Perhaps one of the biggest changes to Kotlin as a whole
+is the upcoming release of version 2.0 of the language,
+complete with a sweeping re-write of the compiler frontend TODO citation.
+
+Code-named \texttt{K2}, the new version of the compiler seeks
+to increase performance and maintain backwards compatibility,
+all while entirely replacing the architecture of the current compile frontend.
+Naturally, any defects in the new compiler implementation
+could have drastic repercussions for Kotlin users, and the
+sheer size of the rewrite warrants extensive amounts of testing.
+The remainder of this study targets the testing of the new
+(experimental) implementation of the \texttt{K2} compiler
+against its previous counterpart, with the goal
+of uncovering defects that the introduction of \texttt{K2} brings with it.
 
 \newacronym{JVM}{JVM} {Java Virtual Machine}
 
@@ -49,6 +70,8 @@ generation to the \gls{JVM} and frees compiler engineers from
 platform- and hardware-specific idiosyncrasies.
 This study focuses on testing the end-to-end compilat1ion pipeline
 of Kotlin through the open-source \texttt{kotlinc} utility.
+
+
 
 \newacronym{SDLC}{SDLC} {Software Development Lifecycle}
 \newacronym{SUT}{SUT} {System Under Test}
@@ -114,7 +137,7 @@ approximate oracles that can partially automate this process.
 Originally proposed by \citet{mckeeman1998differential} in 1998, \Gls{DT}
 offers a compelling and versatile alternative, that uses different versions
 of the same \gls{SUT} to heuristically discover bugs.
-\gls{DT} identifies possibly incorrect behavior when at least
+\gls{DT} identifies incorrect behavior when at least
 one version of the \gls{SUT} returns a result that differs from the others.
 While inexact in its nature, \gls{DT} has become popular
 in the field of compiler testing thanks to its lightweight 
@@ -133,7 +156,7 @@ showed that test suites often evolve in tandem with their code bases.
 These findings suggest that to adequately test an evolving system,
 practitioners not only allocate significant resources to writing test cases,
 but also do so throughout the software's lifetime.
-In an effort to alleviate the human resources involved in the testing process,
+In an effort to alleviate the human effort that testing requires,
 researchers developed a plethora of automated test case generation methods.
 The remainder of this section briefly covers the most prevalent techniques
 in this field.
@@ -149,7 +172,7 @@ to a program capable of generating a stream of random characters.
 This program served as a means of assessing
 the reliability of several tools that were part of the Unix \Gls{OS}.
 At its core, fuzzing is perhaps the simplest possible implementation
-of input generation: the program simply samples data
+of input generation: the \textit{fuzzer} simply samples data
 driven by a pseudo-random random generator and executes
 the target program with the generated input.
 This original formulation of fuzzing bears a close
@@ -177,7 +200,7 @@ fundamental fuzzing paradigms:
 
 \begin{itemize}
 \item \textbf{Mutation-based fuzzers}~rely on predefined input (seeds),
-which they manipulate in heuristic ways to cover the input space.
+which they manipulate in heuristic ways to better cover that \gls{SUT}'s input space.
 The performance of these approaches is often heavily correlated
 with the quality of the corpus of seed inputs as the main source
 of expliting program knowledge.
@@ -197,8 +220,7 @@ These algorithms benefit from the rich literature surrounding
 evolutionary computation and may be better suited at exploring
 specific volumes of the search space.
 Evolutionary fuzzers impose an additional requirement on the \gls{SUT},
-namely that it must be capable of generating meaningful
-feedback for evaluating input.
+namely that it must be capable of meaningfully evaluating generated input.
 \end{itemize}
 
 \newacronym{SBSE}{SBSE} {Search-Based Software Engineering}
@@ -215,7 +237,7 @@ The study and application of metaheuristics to software-centric tasks
 has brought forth many state-of-the-art approaches, and is jointly known
 as \Gls{SBSE}.
 Approaches fixating on the testing phase of the \gls{SDLC}
-belong to a branch of \gls{SBSE} referred to as \gls{SBST}.
+belong to the \gls{SBST} branch of \gls{SBSE}.
 
 Search-based methods generally involve more sophisticated
 mechanisms than fuzzing.
@@ -298,14 +320,14 @@ who in 1975 formalized and cemented the modern \gls{EA} paradigm.
 A plethora of specialized \gls{EA}s have emerged from a vast spectrum of 
 research domains, but arguably the most widespread variation is the
 class of \Gls{GA}.
-Algorithm \ref{alg:sga} provides the pseudocode for the the simple \gls{GA}
+\Cref{alg:sga} provides the pseudocode for the simple \gls{GA}
 proposed by Holland.
 This constitutes the foundation of specialized automated test case generation algorithms
 for several tasks, including unit testing 
 \cite{tonella2004evolutionary, panichella2017automated},
 data flow testing \cite{girgis2005automatic}, and REST API testing
 \cite{arcuri2019restful}.
-Biology-inspired by nature, \gls{GA}s share several core ingredients:
+Biology-inspired by nature, standard \gls{GA} formulations share several core ingredients:
 \begin{itemize}
 \item A \textit{representation} of \textit{individuals},
 	often referred to as \textit{chromosomes}.
@@ -341,14 +363,12 @@ Biology-inspired by nature, \gls{GA}s share several core ingredients:
 	\SetKwFunction{select}{SelectIndividuals}
 	\SetKwInOut{Input}{Input}
 	\SetKwInOut{Output}{Output}
-	\caption{Simple Genetic Algorithm}
-	\Input{Population size $N$}
+	\Input{Population size $n$}
 	\Output{$N$ solutions}
 	\BlankLine
 	\DontPrintSemicolon
 	%\emph{special treatment of the first line}\;
 	
-	\Begin{
 	$t \leftarrow 1$\;
 	$P_1 \leftarrow $ \init{$n$}\;
 	\While{$\neg$ \terminate{$P_t$}}{
@@ -356,9 +376,10 @@ Biology-inspired by nature, \gls{GA}s share several core ingredients:
 		$P_{t+1} \leftarrow$ \select{$P_{t}, O_{t}, n$}\;
 		$t \leftarrow t + 1$\;
 	}
-	\Return $P_t$\;	
-	}
-\label{alg:sga}
+	\Return $P_t$\;
+
+	\caption{Simple Genetic Algorithm}
+	\label{alg:sga}
 \end{algorithm}
 
 \newacronym{CFG}{CFG}{Context-Free Grammar}

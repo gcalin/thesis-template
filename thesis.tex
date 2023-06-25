@@ -8,7 +8,7 @@
 \usepackage{lipsum} % standard filler text, only needed for demo
 \usepackage{tikz,pgffor}
 \usetikzlibrary{positioning,shapes.arrows,arrows.meta,shadows}
-
+%\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 % %% The package 'algorithm' is useful, but incompatible with memoir.
 % %% Cor-Paul Bezemer / http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
 % %% suggest the following fix:
@@ -26,7 +26,7 @@
 \colorlet{gray1}{gray!40!black}
 \colorlet{gray2}{gray!80!black}
 \usepackage{listings}
-
+\usepackage{subfigure}
 \tikzset{XOR/.style={draw,circle,append after command={
         [shorten >=\pgflinewidth, shorten <=\pgflinewidth,]
         (\tikzlastnode.north) edge (\tikzlastnode.south)
@@ -88,7 +88,7 @@
 \definecolor{myturquoise}{rgb}{0.28,0.67,0.76}
 \definecolor{myorange}{rgb}{0.97,0.58,0.27}
 \usepackage{chngcntr}
-\counterwithin{figure}{section}
+\counterwithin{figure}{chapter}
 
 \usepackage{parskip}
 \setlength{\parskip}{0pt}
@@ -97,7 +97,7 @@
 %\usepackage[pdftex]{color}
 %\fi
 
-\usepackage{hyperref}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \usepackage[acronym]{glossaries}
 \makeglossaries
 \setglossarysection{chapter}
@@ -108,7 +108,6 @@
 %\usepackage{algpseudocode}
 %\usepackage{algorithm} 
 %\usepackage{algorithmicx}
-\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 \newcommand*\DNA{\textsc{dna}}
 
 \newcommand*\Let[2]{#1 $\leftarrow$ #2}
@@ -129,7 +128,7 @@
 %                     Options                                         %    
 %---------------------------------------------------------------------%
 
-\title{Software Engineering Research Group \\MSc Thesis Style}
+\title{Test Program-Based Generative\\ Fuzzing for Differential Testing \\of the Kotlin Compiler}
 \subtitle{Version of \today}
 % The final version of your thesis should typically use a different
 % subtitle without the current date, for example
@@ -146,10 +145,10 @@
 % not do your thesis work at a company
 \company{
 %\includegraphics[height=2cm]{img/hilbert.ps}\\
-Some Company\\
-With it's address\\
-ThePlace, the Netherlands\\
-\url{www.url.nl}
+JetBrains N.V.\\
+Huidekoperstraat 26-28\\
+1017 ZM Amsterdam, The Netherlands\\
+\url{https://www.jetbrains.com/}
 }
 
 % Optional (postscript) cover picture. Put this in comments when not needed.
@@ -178,13 +177,16 @@ ThePlace, the Netherlands\\
 \setsecnumdepth{subsection}
 \maxsecnumdepth{subsection}
 
+
+\usepackage{hyperref}
+\usepackage{cleveref}
 \begin{document}
 \frontmatter
 \thispagestyle{empty}
 \maketitle                                      % for the cover page
 \makeformaltitlepages{\input{abstract}}         % for formal title pages with all info
 
-\include{preface}
+%\include{preface}
 
 \cleardoublepage\tableofcontents
 \cleardoublepage\listoffigures

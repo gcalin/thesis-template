@@ -131,7 +131,7 @@ The two approaches work in tandem, comprising a trade-off
 between the flexibility of the input grammar and the
 rich semantics of test suites.
 
-\citet{han2019codealchemist} develop the notion of \textit{semantics-aware assembly},
+\citet{han2019codealchemist} introduce the notion of \textit{semantics-aware assembly},
 which they implement in the \textsc{CodeAlchemist} tool, aimed at JavaScript
 engine testing.
 The key concept in semantics-aware assembly consists of building blocks,
@@ -151,7 +151,6 @@ assembly constraints.
 
 \newacronym{EMI}{EMI} {Equivalence Modulo Inputs}
 \newacronym{MCMC}{MCMC} {Markov Chain Monte Carlo}
-\newacronym{CFG}{CFG} {Control-Flow Graph}
 
 \subsection{\label{subsec:pm}Program Mutation}
 
@@ -219,7 +218,7 @@ that strongly emphasizes types as a powerful medium for generating
 semantically diverse programs.
 Similarly to \gls{SPE}, \gls{TCE} deconstructs a program into a 
 skeleton, a collection of placeholders, and a set of variables.
-IN addition to this breakdown, however, \gls{TCE} equips each 
+In addition to this breakdown, however, \gls{TCE} equips each 
 placeholder with an adherent type, and further considers a set
 of \textit{callabels} that it uses alongside variables.
 The algorithm proceeds in two phases.
@@ -233,9 +232,6 @@ fill type-compatible placeholders placed in the latter seed program.
 Additional expressions obtained either from the standard library 
 or primitive types are additionally employed to populate
 remaining unfilled placeholders.
-
-
-
 
 \section{\label{sec:specification_fuzzing}Specification Fuzzing}
 

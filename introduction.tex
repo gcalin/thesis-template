@@ -22,9 +22,9 @@ as worthy alternatives to mature standards.
 
 Because of their cornerstone role in many critical applications,
 compilers are often subject to thorough quality assurance processes.
-Many research directions incorporate testing as a means
+In practice, the compiler teams often rely on testing as a means
 of assessing and improving the correctness of compilers.
-Empirical evidence supports the benefits of such approaches,
+Empirical evidence effectiveness the benefits of such approaches,
 with \citet{sun2016toward} and \citet{holler2012fuzzing} highlighting
 the existence of bugs in widely used C compilers and JavaScript engines, respectively. 
 These findings stand out because of the maturity of the
@@ -41,10 +41,11 @@ led to automated test case generation methods superseding their
 manual counterparts \citep{chen2020survey, zhao2009automated}.
 Though compelling and time-effective, automated test case
 generation strategies concurrently give rise to an arduous set of challenges.
-The infinite number of correct possible programs, the syntactic dependencies between code snippets,
-the diversity required to exercise a broad range of compiler features,
-and the many semantic nuances attributed to each programming language all constitute
-obstacles that an effective generative algorithm must address.
+The infinite number of correct possible programs,
+the syntactic dependencies between code snippets,
+the broad range of compiler features,
+and the many semantic nuances programming languages exhibit all constitute
+obstacles that effective fuzzing algorithms must address.
 
 Fuzzing, or random testing, lends itself naturally to this task thanks to its
 ability to generate code snippets that trigger diverse behavior within the compiler.
@@ -52,11 +53,11 @@ Because of this, researchers have proposed a myriad of language-specific approac
 fixated around two overarching paradigms.
 Algorithms that generate standalone code such as those proposed by  
 \citet{yang2011finding, holler2012fuzzing, veggalam2016ifuzzer}, and \citet{havrikov2019systematically}
-have the ability to generate novel test programs, which in turn may contain
+have the ability to generate entirely novel test programs, which in turn may contain
 seldom encountered constructs and relations.
 By contrast, mutation-centric approaches such as those put forward by 
 \citet{le2014compiler, le2015finding, sun2016finding}, and \citet{stepanov2021type}
-rely on an input or seed program, that serves as a basis for subsequent transformations.
+rely on an input (or seed) program, that serves as a basis for subsequent transformations.
 While the former approach may be able to explore more of the
 space of feasible input programs, the latter effectively leverages
 large corpora that become available as programming language
@@ -70,7 +71,7 @@ Initially designed as a Java alternative, the Kotlin
 ecosystem has steadily grown and currently envelops
 a broad range of use-cases, including server-side development,
 web front-end interfaces, and mobile applications. 
-Kotlin showcases several compelling features, including expressiveness,
+Kotlin showcases compelling features, including expressiveness,
 safety, and interoperability, which have played a key role in Google embracing
 a "Kotlin-first" approach in its popular Android mobile operating system \cite{kotlinfirst}.
 
@@ -117,6 +118,7 @@ First, this thesis only concerns itself with empirical analyses regarding
 the Kotlin compiler. 
 Though the prototype implementation may well be 
 extended to target other systems, we use a single benchmark to ensure feasibility.
+
 Second, this study investigates the ability of the proposed fuzzing
 techniques to find bugs in the targeted compiler, and does not emphasize
 the practical or commercial implications of the uncovered bugs.
@@ -128,37 +130,41 @@ Within these constraints, we seek to achieve the following research aim:
 \begin{quote}
 \centering 
 \emph{The aim of this research is to gain insight into how 
-effective test program-based fuzzing is at uncovering bugs in the
+effective heuristic-driven 
+test program-based fuzzing is at uncovering bugs in the
 Kotlin compiler.}
 \end{quote}
 
 To address this aim, we implement a grammar-aided fuzzing tool
-that generates Kotlin code snippets. 
-The generated pieces of code serve as input to the compiler,
+that generates varied and valid pieces of Kotlin code. 
+The generated code serves as input to the compiler,
 whose behavior is in turn assessed through differential testing.
 We divide the overarching research aim into several, more granular
 research questions.
-We first consider the effectiveness of our approach in comparison
-to existing mutation-based fuzzing algorithms, leading to
-the following research question:
+We first consider the effectiveness of our approach in an unguided
+setting, where randomness is the main driving force behind the generative
+process.
+The following research question embodies this objective:
 
 \begin{quote}
 \centering 
-\emph{\textbf{RQ1:} How effective is test program-based
-fuzzing compared to mutation-based fuzzing
-at uncovering bugs in the Kotlin compiler?}
+\emph{\textbf{RQ1:} How effective is unguided program-based
+fuzzing at uncovering bugs in the Kotlin compiler?}
 \end{quote}
 
-To better understand the reasons behind the relative performance
-of our approach, we seek to isolate its most crucial components.
-Such insight establishes a baseline for future research to expand upon
-by providing insight into which fuzzing techniques result in better performance.
-We encapsulate this goal into the following research question:
+The empirically assessed effectiveness of random fuzzing
+unlocks the potential analysis of more sophisticated guiding
+heuristics by comparison.
+The second research question aims to investigate
+the relative bug-uncovering potential of such heuristics
+within an evolutionary framework:
+
 
 \begin{quote}
 \centering 
-\emph{\textbf{RQ2:} How effective are different test program-based
-fuzzing heuristics at uncovering bugs in the Kotlin compiler?}
+\emph{\textbf{RQ2:} How effective is meta-heuristic
+guided test-program based evolutionary fuzzing
+at uncovering bugs in the Kotlin compiler?}
 \end{quote}
 
 A vital point to consider when designing a fuzzing algorithm is
@@ -169,36 +175,42 @@ detecting new faults.
 To combat this, practitioners can either design new tools, adapt existing
 ones, or intertwine approaches.
 While flexible design can help mitigate this shortcoming, studying the 
-bug finding capability of a combination of tools enables
-the exploration of a broader range of the input space.
-To explore this potential, we study the effectiveness of 
-integrating of test program- and mutation-based fuzzing.
-To this end, we propose the following research question:
+impact of cornerstone hyperparameters and heuristic choices
+is crucial for understanding the scope of a fuzzer and the
+inherent properties of its ouput.
+To this end, we formulate the following research question:
 
 \begin{quote}
 \centering 
-\emph{\textbf{RQ3:} How effective is the combination of 
-test program- and mutation-based fuzzing techniques at uncovering
-bugs in the Kotlin compiler?}
+\emph{\textbf{RQ3:} How do meta-heuristic guidance
+criteria influence the properties of test-program based
+evolutionary fuzzing?}
 \end{quote}
 
 \section{Contributions and Significance}
 
 This thesis makes both theoretical and practical advances,
 relevant to both the field of compiler testing and to the 
-Kotlin community. To summarize, we expect this
-study to result in the following contributions:
+Kotlin community.
+The study makes the four following contributions:
 
 \begin{enumerate}
-	\item At least one novel grammar-aided, Kotlin-specific compiler fuzzing algorithm.
-	\item A modular and configurable prototype implementing the novel algorithm.
-	\item Empirical analyses comparing the bug finding capabilities of test program- and mutation-based fuzzers for Kotlin, as well as the combination of the two
-	\item A replication package containing open-source artifacts, able to reproduce the studies
+	\item Three novel formulations of grammar-aided test program-based compiler fuzzing,
+including a random-driven random sampling approach,
+and two evolutionary algorithms revolving
+around diversity- and proximity-driven criteria
+	\item A modular, configurable, and extendable framework for
+end-to-end automated fuzzing of the Kotlin compiler,
+implementing the three proposed approaches.
+	\item Empirical analyses comparing the bug finding capabilities
+and heuristic-driven behavior of the three novel fuzzing algorithms.
+	\item A replication package containing open-source artifacts, and analytics tools
+for validating, verifying, and extending the current study.
 \end{enumerate}
 
 From a theoretical perspective, we expect our contributions
 to deepen the insight into the applicability and effectiveness
-of test program-based fuzzing and its adjacent heuristics, as a 
+of test program-based fuzzing and its adjacent heuristics as a 
 means of compiler testing. 
 The significance of this knowledge is tied to the continued
 interest in establishing reliable quality assurance measures for compilers.
