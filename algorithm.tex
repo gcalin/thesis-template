@@ -50,15 +50,16 @@ explicitly belongs to a type hierarchy, while the $\epsilon$ transition represen
 the inheritance of a symbolic type.
 
 \begin{figure}
+    \footnotesize
     \centering
 	\begin{tikzpicture}
 	\begin{scope}[every node/.style={circle,thick,draw} ]
-		\node[minimum size=75pt] (D) at (5,4) {\texttt{Any}};
-    		\node[minimum size=75pt] (A) at (0,0) {\texttt{Number}};
-    		\node[minimum size=75pt] (B) at (5,0) {\texttt{Comparable$<$E$>$}};
-    		\node[minimum size=75pt] (C) at (2.5,-5) {\texttt{Double}};
-    		\node[minimum size=75pt] (E) at (10,0) {\texttt{Iterable$<$E$>$}};
-    		\node[minimum size=75pt] (F) at (10,-5) {\texttt{Collection$<$E$>$}};
+		\node[minimum size=30pt] (D) at (5,4) {\texttt{Any}};
+    		\node[minimum size=30pt] (A) at (0,4) {\texttt{Number}};
+    		\node[minimum size=30pt] (B) at (5,1) {\tiny\texttt{Comparable$<$E$>$}};
+    		\node[minimum size=30pt] (C) at (0,1) {\tiny\texttt{Double}};
+    		\node[minimum size=30pt] (E) at (10,4) {\scriptsize\texttt{Iterable$<$E$>$}};
+    		\node[minimum size=30pt] (F) at (10,1) {\tiny\texttt{Collection$<$E$>$}};
 	\end{scope}
 	\begin{scope}[>={Stealth[black]},
               every node/.style={fill=white,circle},
@@ -408,7 +409,7 @@ appropriate methods of leveraging the \texttt{sample} property of each affected 
     }
   }
 %  child {node [circle,draw] (j) {\textsc{As}}
-    child {node [circle,draw,color=gray,line width=1mm] (k) {\textsc{As}}
+    child[dashed] {node [circle,draw,color=gray,line width=1mm] (k) {\textsc{As}}
         child {node [circle,draw,color=gray,line width=1mm] (l) {\textsc{Expr}}}
 %    }
 };
