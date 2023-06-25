@@ -1,18 +1,297 @@
 \chapter{\label{cha:related}Related Work}
 
-(Your topic here) is a well explored domain in computer science. This
-chapter discusses technologies related to (my research project). It is
-divided into \ldots
+This chapter surveys relevant academic work within
+the fields of compiler testing and fuzzing.
+Section \ref{sec:compiler_testing} examines existing
+automated compiler testing tools and their underlying rationale.
+Section \ref{sec:specification_fuzzing} surveys algorithms
+for specification fuzzing, a problem whose elemental challenges
+share many commonalities with compiler testing. 
 
-\section{Related part I}
+\section{\label{sec:compiler_testing}Automated Compiler Testing}
 
-\lipsum{2} % add some pseudo content
+\newglossaryentry{tpg}
+{
+        name=test program generation,
+        description={A compiler testing technique
+        that generates novel valid programs
+        without relying on a pre-existing corpus}
+}
 
-\section{Related part II}
+\newglossaryentry{pm}
+{
+        name=program mutation,
+        description={A compiler testing technique
+        that generates alters existing programs}
+}
 
-\lipsum{4} % add some pseudo content
+Over the years, specialized testing approaches have emerged
+as tools for improving compiler reliability.
+To navigate the ample space of approaches, we adopt a simplified
+version of the taxonomy proposed by \citet{chen2020survey}. 
+Most notably, we distinguish between \gls{tpg} and \gls{pm} approaches, discussed
+in subsections \ref{subsec:tpg} and \ref{subsec:pm}, respectively.
+The former generates programs for scratch, without any
+external seed, while the latter mutates existing programs to generate
+new variations. 
+\Gls{tpg} approaches also differ in the way in which they
+utilize the grammar of the target language.
+Based on this property, \citet{chen2020survey} distinguish three
+categories.
+Grammar-directed approaches solely rely on the
+language grammar to generate novel test cases.
+Grammar-aided approaches heuristically exploit a given
+grammar, which is often enriched with semantically
+significant context. 
+Finally, fuzzers may not directly rely on a grammar,
+and instead define sound heuristic that respect
+a given linguistic syntax.
 
-\section{Related part III}
 
-\lipsum{1} % add some pseudo content
+\newacronym{UB}{UB} {Undefined Behavior}
+\newacronym{AST}{AST} {Abstract Syntax Tree}
 
+\subsection{\label{subsec:tpg}Test Program Generation}
+
+\citet{purdom1972sentence} devised one of the first algorithms aimed at
+validating the validity of \gls{CFG} parsers.
+This grammar-direct approach applies iterative rewriting rules
+starting from a starting symbol, eventually reaching all grammar productions.
+The algorithm heuristically favors short sentences, that aid in the
+debugging of uncovered faults.
+Faults are detected when the production sequence used to generate a particular
+sentence differs from the representation returned by the parser under test.
+Purdom's \cite{purdom1972sentence} empirical analysis demonstrates
+that this algorithm is effective at exploring the available
+states and transitions of \gls{CFG}s.
+However, this simplistic approach does not generalize
+well to contemporary programming language compiler testing,
+as it contains no mechanism to account for the rich semantics
+that accompany \gls{CFG} specifications.
+
+\citet{yang2011finding} propose \textsc{Csmith}, a grammar-aided
+test program generation tool aimed at finding bugs in commercial 
+C compiler using \gls{DT}.
+\textsc{Csmith} first creates a set of \texttt{struct} type
+declaration, with a stochastically-driven  number of members, which 
+it stores as additional information next to the C programming language grammar.
+\textsc{Csmith} then creates programs in a top-down fashion, starting from a
+single program entry point, the \texttt{main} function.
+At each iteration, it interweaves two steps: (i) instantiating
+a randomly chosen production from its grammar, accompanied
+by target completion, and (ii) validating the intermediate program
+using a series of safety checks with the goal of avoiding undefined behavior.
+The generation process follows an "on-demand" paradigm, where \texttt{struct}
+members and functions are generated when previously generated expressions
+access them.
+This approach fundamentally differs to Purdom's \cite{purdom1972sentence} paradigm,
+in that it strongly emphasizes the semantic constraints of C over 
+structural \gls{CFG} coverage.
+\textsc{Csmith}'s effectiveness has inspired several variations such in
+Lidbury et al.'s \textsc{CLsmith} \cite{lidbury2015many} and
+Morisset et al.'s \cite{morisset2013compiler} tool for uncovering
+concurrency bugs.
+
+\citet{livinskii2020random} introduce \textsc{YARPGen}, a C/C++ program generation
+tool that aims to increase the expressiveness and diversity of test programs.
+\textsc{YARPGen} proceeds in top-down fashion and does not explicitly utilize
+a formal language grammar.
+Instead, it tracks a \textit{type environment} that stores all visible composite
+data types, which implicitly guide the generative process.
+The environment is iteratively enriched with newly generated types,
+each having access to all previous entries.
+Once established, the generated types drive the creation of global variables
+that can be used in future statements.
+\textsc{YARPGen} incrementally builds functions that utilize 
+the previously generated types and symbols.
+Each expression in a statement is recursively constructed 
+such that it avoids \Gls{UB}.
+To further increase the soundness of its output, \textsc{YARPGen}
+performs local fixes that eliminate several common \gls{UB} instances.
+Finally, \textit{generation policies} provide a mechanism
+for adapting the probability distribution dictating
+\textsc{YARPGen}'s choices.
+This feature serves as a way of incorporating prior knowledge into
+the program and enables users to target specific features of the language
+or compiler.
+
+\citet{holler2012fuzzing} developed \textsc{LangFuzz}, a grammar-directed fuzzing
+approach that combines generative and mutative processes.
+The mutation process follows a two-phase approach, first \textit{learning}
+code fragments from existing test suites, and then constructing executable
+mutants from its input. 
+A grammar enables the extraction of code fragments, which \textsc{LangFuzz}
+obtains by breaking down hand-written test suites.
+In practice, a \textit{fragment pool} emerges from the non-terminal
+instantiations of grammar rules within the input test suites.
+To complement this mutative process, \textsc{LangFuzz} leverages
+a generative procedure that stochastically expands the input
+grammar in a breadth-first manner.
+The two approaches work in tandem, comprising a trade-off
+between the flexibility of the input grammar and the
+rich semantics of test suites.
+
+\citet{han2019codealchemist} introduce the notion of \textit{semantics-aware assembly},
+which they implement in the \textsc{CodeAlchemist} tool, aimed at JavaScript
+engine testing.
+The key concept in semantics-aware assembly consists of building blocks,
+also referred to as \textit{code bricks}, a notion similar to
+\textsc{LangFuzz}'s \textit{code fragments} \cite{holler2012fuzzing}.
+A code brick consists of a valid JavaScript \gls{AST} that is additionally
+annotated with an \textit{assembly constraint}.
+Assembly constraints are sets of pre- and post-condition
+that must be satisfied for two code bricks to be compatible.
+Such constraints specify what variables must be defined in
+preceding code bricks, and what additional objects are
+visible in subsequent bricks, respectively.
+\textsc{CodeAlchemist} produces fuzzed programs by splitting
+input seeds into code bricks, which it then stochastically
+interconnects in ways that adhere to the bricks'
+assembly constraints.
+
+\newacronym{EMI}{EMI} {Equivalence Modulo Inputs}
+\newacronym{MCMC}{MCMC} {Markov Chain Monte Carlo}
+
+\subsection{\label{subsec:pm}Program Mutation}
+
+\citet{le2014compiler} introduce the notion of \Gls{EMI},
+a framework for establishing semantic equivalence between
+programs.
+Given a set of valid program inputs $I$,
+two programs $P_1$ and $P_2$ are equivalent modulo $I$
+if and only if their outputs are identical for all inputs
+$i \in I$.
+This notion lends itself naturally to the \gls{DT} framework:
+since $P_1$ and $P_2$ are expected to produce identical results
+for all input in $I$, any discrepancies that emerge during execution
+can be attributed to compiler faults.
+\textsc{Orion} is a mutation-centric realization of this framework for 
+the C programming language.
+To derive semantically equivalent programs, \textsc{Orion} profiles the
+execution of a program $P$ over an input set $I$ and determines
+which code snippets remain are not executed.
+\textsc{Orion} then exploits this information to stochastically
+prune the unexecuted lines of code, maintaining the semantics of
+the original program $P$.
+
+\citet{le2015finding} extend \textsc{Orion} in a tool named \textsc{Athena},
+equipped with a heuristic guidance mechanism.
+Still reliant on the \gls{EMI} framework, \textsc{Athena} improves
+the random mutation-driven search of \textsc{Orion} with heuristic
+diversity-based probability distribution.
+The goal of this strategy is to exercise an ample range of compiler
+optimization mechanics, which is more likely as when the equivalent 
+programs themselves are more diverse.
+To achieve this, \textsc{Athena} leverages a \Gls{MCMC} sampling technique.
+A \Gls{CFG}-based similarity metric guides the \gls{MCMC} search,
+favoring programs that significantly differ in their \gls{CFG} representation.
+Novel programs emerge from either the deletion of unused code, or the insertion
+of code in unused sections.
+
+\newacronym{SPE}{SPE}{Skeletal Program Enumeration}
+
+\citet{zhang2017skeletal} introduce the notion of \gls{SPE}, a framework
+for exhaustively representing variable usage patterns in small programs.
+\gls{SPE} breaks a program down into three components: a syntactic skeleton,
+a collection of variable placeholders, and a set of variables.
+Variable usages within a program are conceptually transformed into \textit{holes},
+that can be \textit{filled} to \textit{realize} a concrete program.
+This framework enables the enumeration of all possible arrangements
+of variables in such a way that filling the holes results in novel programs.
+The authors further define the concept of $\alpha$\textit{-equivalence} between
+programs.
+Two programs are $\alpha$-equivalent if they exhibit the same control- and data-
+dependence properties.
+Notably, naive enumeration can result in numerous $\alpha$-equivalent programs
+under different variable permutations.
+To avoid the generation of such equivalent programs due to $\alpha$\textit{-renaming},
+the authors show the \gls{SPE} can be reduced to the \textit{set partition problem},
+which displays the same equivalence structure.
+The proposed algorithm handles variable scopes by promoting certain
+\textit{local holes} to global ones and computing the Cartesian product 
+between the two disjoint sets.
+
+\newacronym{TCE}{TCE}{Type-Centric Enumeration}
+
+\citet{stepanov2021type} propose \Gls{TCE}, an extension of \gls{SPE} 
+that strongly emphasizes types as a powerful medium for generating
+semantically diverse programs.
+Similarly to \gls{SPE}, \gls{TCE} deconstructs a program into a 
+skeleton, a collection of placeholders, and a set of variables.
+In addition to this breakdown, however, \gls{TCE} equips each 
+placeholder with an adherent type, and further considers a set
+of \textit{callabels} that it uses alongside variables.
+The algorithm proceeds in two phases.
+The \textit{generation} phase is responsible for the 
+creation of a set of typed expressions, which it extracts from
+the callable set of its seed program.
+The \textit{mutation} phase operates on a different seed program,
+which it first merges with that of the previous stage.
+Subsequently, the expressions obtained in the generation phase
+fill type-compatible placeholders placed in the latter seed program.
+Additional expressions obtained either from the standard library 
+or primitive types are additionally employed to populate
+remaining unfilled placeholders.
+
+\section{\label{sec:specification_fuzzing}Specification Fuzzing}
+
+\citet{steinhofel2022input} propose the Input Specification Language (\textsc{ISLa}),
+a declarative language for integrating context-dependent semantic constraints
+in otherwise coarser \gls{CFG} definitions.
+Programming languages often impose complex semantic relations that 
+\gls{CFG}s cannot encapsulate.
+This includes even commonplace constraints such as \textit{"a variable must be
+declared before it is assigned"}.
+\textsc{ISLa} builds upon constraint solvers to incorporate complex annotations
+that can model such relations. 
+The \textsc{ISLa} solver iteratively expands a tree representation
+each constraint annotation applied to the grammar according to production rules.
+Expansions that do not match the annotations are excluded from the
+cost function-guided solving procedure, as valid candidates emerge.
+Eventually, if a the solver discovers a matching expansion, it first
+(approximately) translates it to a regular expression representation
+before querying a specialized constraint solver.
+\textsc{ISLa} then converts this solution back to a 
+derivation tree representation and substitutes it in the
+original grammar graph.
+
+\citet{havrikov2019systematically} study coverage criteria of \gls{CFG}s and 
+accompanying coverage-centric generative algorithms.
+\textit{Symbol coverage} is a straight-forward metric for evaluating
+how much of a specification grammar a derivation tree covers.
+Symbolic coverage is simply measured the fraction of symbolic nodes in the
+grammar, that the derivation tree covers.
+\textit{k-Path} coverage is a more nuanced criterion that additionally
+takes into account the \textit{context} surrounding a symbolic node's
+position within a tree. 
+Formally, a \textit{k-path} is a directional sequence of nodes in a derivation 
+that contains exactly \textit{k} symbolic nodes.
+The concept of \textit{k-path} coverage naturally follows from this
+definition: a collection of inputs achieves \textit{k-path} coverage if
+each \textit{k-path} in the grammar graph is present in the underlying
+set of derivation trees.
+The authors derive an enumeration-based \textit{k-path} algorithm
+stochastically iterates through all \textit{k-paths} up to a user-defined
+depth and instantiating encompassing derivation trees.
+
+\citet{kreutzer2020language} introduce the language specification language
+(\textsc{LaLa}), a framework for semantically enriching the syntactic
+specification of languages.
+At its core, \textsc{LaLa} offers a declarative implementation of an
+attribute grammar that operates over programs represented as \gls{AST}s.
+Each production in the underlying syntactic \gls{CFG} takes the form of a
+class, that embeds additional mechanisms to provide semantics to the
+overarching \gls{AST}.
+\gls{AST}s model information flow both bottom-up (through
+\textit{synthesized} attribute values) and top-down (through
+\textit{inherited} attribute values), and their semantic validity
+is determined through boolean-valued \textit{guard} attributes embedded in
+some nodes.
+The \textsc{*Smith} fuzzer leverages this representation to generate valid
+program representations through \gls{AST}s with conforming guard attributes.
+The algorithm generates programs by randomly instantiating nodes by randomly
+walking over available productions, additionally caching \textit{fail patterns}
+that occur when nodes with false guard attribute values emerge.
+Additional heuristics for fail pattern recognition, as well as subtree
+replacement and deconstruction additionally improve the effectiveness
+of \textsc{*Smith}.

@@ -37,7 +37,7 @@
 %---------------------------------------------------------------------%
 
 \gdef\theauthor{\@author}
-\gdef\@chair{Prof. Dr. A. van Deursen, Faculty EEMCS, TU Delft}
+\gdef\@chair{Prof. Dr. A. van Dsssseursen, Faculty EEMCS, TU Delft}
 \gdef\@supervisor{Dr. E. Visser, Faculty EEMCS, TU Delft}
 \gdef\@colophon{\copyright \the\year \: \theauthor. All rights reserved.}
 
@@ -108,8 +108,9 @@ Delft, the Netherlands \\
 \def\@MAJOR{COMPUTER SCIENCE}
 
 \def\makeformaltitlepages#1{%
-\begingroup\newpage
-\thispagestyle{empty}\setcounter{page}{1}
+\begingroup
+\newpage\thispagestyle{empty}
+\setcounter{page}{1}
 \let\footnotesize\small \let\footnoterule\relax
 %\null
 \noindent\rule{\textwidth}{1.5pt}
@@ -179,14 +180,16 @@ Email: & \@authoremail \\
 \noindent\begin{tabular}{@{}ll@{}}
 \\
 Thesis Committee:\\\\
-Chair: & \@chair\\
-University supervisor: & \@supervisor\\
+Chair, University supervisor: & Dr. A. Panichella, Faculty EEMCS, TU Delft\\
+External supervisor: & Dr. S. E. Verwer, Faculty EEMCS, TU Delft\\
 \ifexternal@supervisor
-Company supervisor: & \@externalsupervisor\\
+Company supervisor: & Ir. M. Akhin, Applied Program Analysis Lab, JetBrains\\
+Company supervisor: & Dr. P. Derakhshanfar, Intelligent Collaboration Tools Lab, JetBrains\\
 \fi
 \ifcommittee@member
-Committee Member: & \@committeemember\\
+University co-supervisor: & Ir. M. Olsthoorn, Faculty EEMCS, TU Delft\\
 \fi
 \\\\\\\end{tabular}
 \cleardoublepage\endgroup
 }
+ 

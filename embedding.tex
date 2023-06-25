@@ -1,0 +1,78 @@
+\begin{figure}[t]
+\vspace{2cm}
+\centering
+\begin{tikzpicture}[transform canvas={scale=1.0},node/.style={circle, draw, thick}]
+
+\foreach \Z in {0,0.5,1,1.5}
+ {\draw[fill=gray,draw=black] (-8,0,\Z) rectangle (-7.25,1,\Z);}
+
+\node[] at (-7.5,1.5)   (a) {Chromosome};
+
+ \draw [-stealth] (-7.15, 0.5) -- node[pos=0.5,above]{Construct} (-5.5, 0.5);
+ 
+ \pgfmathsetmacro{\cubex}{1.25}
+\pgfmathsetmacro{\cubey}{1.25}
+\pgfmathsetmacro{\cubez}{1.25}
+\draw[black,fill=gray] (-4,1,0) -- ++(-\cubex,0,0) -- ++(0,-\cubey,0) -- ++(\cubex,0,0) -- cycle;
+\draw[black,fill=gray] (-4,1,0) -- ++(0,0,-\cubez) -- ++(0,-\cubey,0) -- ++(0,0,\cubez) --  cycle;
+\draw[black,fill=gray] (-4,1,0) -- ++(-\cubex,0,0) -- ++(0,0,-\cubez) -- ++(\cubex,0,0) -- cycle;
+
+\node[] at (-4.25,1.875)   (a) {Text};
+
+\draw [-stealth] (-3.25, 0.5) -- node[pos=0.5,above]{NN Input} (-1.75, 0.5);
+
+  \foreach \y in {1,...,3}{
+      \node[node] (i\y) at (-1,\nodesep*\y-0.5) {};
+      \node[node, right=\layersep of i\y] (h1\y) {};
+      \node[node, right=\layersep of h1\y] (h2\y) {};
+    }
+
+  \foreach \source in {1,...,3}
+  \foreach \dest in {1,...,3}{
+      \path[-stealth, thick] (i\source) edge (h1\dest);
+      \path[-stealth, thick] (h1\source) edge (h2\dest);
+    }
+
+\draw[] (-1.5, -0.5) rectangle (1.25, 1.5);
+
+\node[] at (-0.125,1.875)   (a) {Embedding NN};
+
+\draw [-stealth] (1.5, 0.5) -- node[pos=0.5,above]{NN Output} (3.5, 0.5);
+
+\node[right,scale=0.9] at (3.5,0.5)
+    {$\begin{pmatrix}
+        0.4\\[0.3em]
+        0.2\\
+        \vdots \\
+        0.7
+       \end{pmatrix} \in \mathbb{R}^{k}$};
+      
+%\draw [-stealth] (4.25, 0.25) -- (5.5, 0.25) -- (5.5,-0.45);
+
+
+  \def\rvec{.8}
+  \def\thetavec{30}
+  \def\phivec{60}
+  
+  \draw[-stealth] (4.75, -0) -- (6.5, -0);
+  
+  % AXES
+  \coordinate (O) at (8,-0,0);
+  \draw[thick,->] (7,-0,0) -- (8,0,0) node[below left=-0.5]{$x$};
+  \draw[thick,->] (7,-0,0) -- (7,1,0) node[right=-0.5]{$y$};
+  \draw[thick,->] (7,-0,0) -- (7,0,1) node[above=-0.5]{$z$};
+  
+  \filldraw[gray2] (7.5,1, 0.5) circle (2pt) node[anchor=west]{$b_1$};
+  \filldraw[gray2] (7.35,0.5, 0.5) circle (2pt) node[anchor=west]{$b_2$};
+  \filldraw[gray2] (7.75,0.75, 0.5) circle (2pt) node[anchor=west]{$b_3$};
+  
+  \filldraw[gray1] (7,-0.5, 0) circle (2pt) node[anchor=west]{$b_4$};
+  \filldraw[gray1] (7.35,0, 0.5) circle (2pt) node[anchor=west]{$b_5$};
+  \filldraw[gray1] (7.85,-0.1, 0.5) circle (2pt) node[anchor=west]{$b_6$};
+  
+  \filldraw[red] (6.75,0.5, 0.5) circle (2pt) node[anchor=south]{$b_7$};
+\end{tikzpicture}
+\vspace{0.5cm}
+\caption{Visualization of the code embedding process.}
+\label{fig:embeddings}
+\end{figure}

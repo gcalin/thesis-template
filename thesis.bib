@@ -17,3 +17,937 @@
   year =	 1995,
 }
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% COMPILER FUZZING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@inproceedings{stepanov2021type,
+  title={Type-Centric Kotlin Compiler Fuzzing: Preserving Test Program Correctness by Preserving Types},
+  author={Stepanov, Daniil and Akhin, Marat and Belyaev, Mikhail},
+  booktitle={2021 14th IEEE Conference on Software Testing, Verification and Validation (ICST)},
+  pages={318--328},
+  year={2021},
+  organization={IEEE}
+}
+
+
+@inproceedings{veggalam2016ifuzzer,
+  title={Ifuzzer: An evolutionary interpreter fuzzer using genetic programming},
+  author={Veggalam, Spandan and Rawat, Sanjay and Haller, Istvan and Bos, Herbert},
+  booktitle={European Symposium on Research in Computer Security},
+  pages={581--601},
+  year={2016},
+  organization={Springer}
+}
+
+@article{purdom1972sentence,
+  title={A sentence generator for testing parsers},
+  author={Purdom, Paul},
+  journal={BIT Numerical Mathematics},
+  volume={12},
+  number={3},
+  pages={366--375},
+  year={1972},
+  publisher={Springer}
+}
+
+@inproceedings{havrikov2019systematically,
+  title={Systematically covering input structure},
+  author={Havrikov, Nikolas and Zeller, Andreas},
+  booktitle={2019 34th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  pages={189--199},
+  year={2019},
+  organization={IEEE}
+}
+
+@article{marcozzi2019compiler,
+  title={Compiler fuzzing: How much does it matter?},
+  author={Marcozzi, Micha{\"e}l and Tang, Qiyi and Donaldson, Alastair F and Cadar, Cristian},
+  journal={Proceedings of the ACM on Programming Languages},
+  volume={3},
+  number={OOPSLA},
+  pages={1--29},
+  year={2019},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{amalfitano2015exploiting,
+  title={Exploiting the saturation effect in automatic random testing of android applications},
+  author={Amalfitano, Domenico and Amatucci, Nicola and Fasolino, Anna Rita and Tramontana, Porfirio and Kowalczyk, Emily and Memon, Atif M},
+  booktitle={2015 2nd ACM International Conference on Mobile Software Engineering and Systems},
+  pages={33--43},
+  year={2015},
+  organization={IEEE}
+}
+
+
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7804063
+
+@inproceedings{nakamura2016random,
+  title={Random testing of C compilers based on test program generation by equivalence transformation},
+  author={Nakamura, Kazuhiro and Ishiura, Nagisa},
+  booktitle={2016 IEEE Asia Pacific Conference on Circuits and Systems (APCCAS)},
+  pages={676--679},
+  year={2016},
+  organization={IEEE}
+}
+
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7804063
+
+@inproceedings{sun2016toward,
+  title={Toward understanding compiler bugs in GCC and LLVM},
+  author={Sun, Chengnian and Le, Vu and Zhang, Qirun and Su, Zhendong},
+  booktitle={Proceedings of the 25th International Symposium on Software Testing and Analysis},
+  pages={294--305},
+  year={2016}
+}
+
+% https://dl.acm.org/doi/pdf/10.1145/2931037.2931074
+
+@inproceedings{chen2016coverage,
+  title={Coverage-directed differential testing of JVM implementations},
+  author={Chen, Yuting and Su, Ting and Sun, Chengnian and Su, Zhendong and Zhao, Jianjun},
+  booktitle={proceedings of the 37th ACM SIGPLAN Conference on Programming Language Design and Implementation},
+  pages={85--99},
+  year={2016}
+}
+
+% https://dl.acm.org/doi/pdf/10.1145/2908080.2908095
+
+@article{livinskii2020random,
+  title={Random testing for C and C++ compilers with YARPGen},
+  author={Livinskii, Vsevolod and Babokin, Dmitry and Regehr, John},
+  journal={Proceedings of the ACM on Programming Languages},
+  volume={4},
+  number={OOPSLA},
+  pages={1--25},
+  year={2020},
+  publisher={ACM New York, NY, USA}
+}
+
+% https://raw.githubusercontent.com/intel/yarpgen/main/papers/yarpgen-ooplsa-2020.pdf
+
+@article{le2014compiler,
+  title={Compiler validation via equivalence modulo inputs},
+  author={Le, Vu and Afshari, Mehrdad and Su, Zhendong},
+  journal={ACM Sigplan Notices},
+  volume={49},
+  number={6},
+  pages={216--226},
+  year={2014},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{le2015finding,
+  title={Finding deep compiler bugs via guided stochastic program mutation},
+  author={Le, Vu and Sun, Chengnian and Su, Zhendong},
+  journal={ACM SIGPLAN Notices},
+  volume={50},
+  number={10},
+  pages={386--399},
+  year={2015},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{sun2016finding,
+  title={Finding compiler bugs via live code mutation},
+  author={Sun, Chengnian and Le, Vu and Su, Zhendong},
+  booktitle={Proceedings of the 2016 ACM SIGPLAN International Conference on Object-Oriented Programming, Systems, Languages, and Applications},
+  pages={849--863},
+  year={2016}
+}
+
+% https://dl.acm.org/doi/pdf/10.1145/2666356.2594334
+
+@article{nagai2014reinforcing,
+  title={Reinforcing random testing of arithmetic optimization of C compilers by scaling up size and number of expressions},
+  author={Nagai, Eriko and Hashimoto, Atsushi and Ishiura, Nagisa},
+  journal={IPSJ Transactions on System LSI Design Methodology},
+  volume={7},
+  pages={91--100},
+  year={2014},
+  publisher={Information Processing Society of Japan}
+}
+
+% https://www.jstage.jst.go.jp/article/ipsjtsldm/7/0/7_91/_pdf
+
+@inproceedings{yang2011finding,
+  title={Finding and understanding bugs in C compilers},
+  author={Yang, Xuejun and Chen, Yang and Eide, Eric and Regehr, John},
+  booktitle={Proceedings of the 32nd ACM SIGPLAN conference on Programming language design and implementation},
+  pages={283--294},
+  year={2011}
+}
+
+
+% https://dl.acm.org/doi/pdf/10.1145/1993498.1993532
+
+@inproceedings{hoare2003verifying,
+  title={The verifying compiler: A grand challenge for computing research},
+  author={Hoare, Tony},
+  booktitle={International Conference on Compiler Construction},
+  pages={262--272},
+  year={2003},
+  organization={Springer}
+}
+
+@inproceedings{holler2012fuzzing,
+  title={Fuzzing with code fragments},
+  author={Holler, Christian and Herzig, Kim and Zeller, Andreas},
+  booktitle={21st USENIX Security Symposium (USENIX Security 12)},
+  pages={445--458},
+  year={2012}
+}
+
+@article{chen2020survey,
+  title={A survey of compiler testing},
+  author={Chen, Junjie and Patra, Jibesh and Pradel, Michael and Xiong, Yingfei and Zhang, Hongyu and Hao, Dan and Zhang, Lu},
+  journal={ACM Computing Surveys (CSUR)},
+  volume={53},
+  number={1},
+  pages={1--36},
+  year={2020},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{zhao2009automated,
+  title={Automated test program generation for an industrial optimizing compiler},
+  author={Zhao, Chen and Xue, Yunzhi and Tao, Qiuming and Guo, Liang and Wang, Zhaohui},
+  booktitle={2009 ICSE Workshop on Automation of Software Test},
+  pages={36--43},
+  year={2009},
+  organization={IEEE}
+}
+
+@article{lidbury2015many,
+  title={Many-core compiler fuzzing},
+  author={Lidbury, Christopher and Lascu, Andrei and Chong, Nathan and Donaldson, Alastair F},
+  journal={ACM SIGPLAN Notices},
+  volume={50},
+  number={6},
+  pages={65--76},
+  year={2015},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{morisset2013compiler,
+  title={Compiler testing via a theory of sound optimisations in the C11/C++ 11 memory model},
+  author={Morisset, Robin and Pawan, Pankaj and Zappa Nardelli, Francesco},
+  journal={ACM SIGPLAN Notices},
+  volume={48},
+  number={6},
+  pages={187--196},
+  year={2013},
+  publisher={ACM New York, NY, USA}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kotlin quality /  motivation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@article{gois2019empirical,
+  title={An empirical study on quality of Android applications written in Kotlin language},
+  author={G{\'o}is Mateus, Bruno and Martinez, Matias},
+  journal={Empirical Software Engineering},
+  volume={24},
+  number={6},
+  pages={3356--3393},
+  year={2019},
+  publisher={Springer}
+}
+
+@article{ardito2020effectiveness,
+  title={Effectiveness of Kotlin vs. Java in android app development tasks},
+  author={Ardito, Luca and Coppola, Riccardo and Malnati, Giovanni and Torchiano, Marco},
+  journal={Information and Software Technology},
+  volume={127},
+  pages={106374},
+  year={2020},
+  publisher={Elsevier}
+}
+
+@inproceedings{flauzino2018you,
+  title={Are you still smelling it? A comparative study between Java and Kotlin language},
+  author={Flauzino, Matheus and Ver{\'\i}ssimo, J{\'u}lio and Terra, Ricardo and Cirilo, Elder and Durelli, Vinicius HS and Durelli, Rafael S},
+  booktitle={Proceedings of the VII Brazilian symposium on software components, architectures, and reuse},
+  pages={23--32},
+  year={2018}
+}
+
+@inproceedings{oliveira2020adoption,
+  title={On the adoption of kotlin on android development: A triangulation study},
+  author={Oliveira, Victor and Teixeira, Leopoldo and Ebert, Felipe},
+  booktitle={2020 IEEE 27th International Conference on Software Analysis, Evolution and Reengineering (SANER)},
+  pages={206--216},
+  year={2020},
+  organization={IEEE}
+}
+
+@inproceedings{chauhan2021performance,
+  title={Performance Analysis of Kotlin Coroutines on Android in a Model-View-Intent Architecture pattern},
+  author={Chauhan, Kshitij and Kumar, Shivam and Sethia, Divyashikha and Alam, Mohammad Nadeem},
+  booktitle={2021 2nd International Conference for Emerging Technology (INCET)},
+  pages={1--6},
+  year={2021},
+  organization={IEEE}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Web pages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+@online{kotlinfirst,
+  author = {Android Developers},
+  title = {Android’s Kotlin-first approach},
+  year = 2019,
+  url = {https://developer.android.com/kotlin/first},
+  note = {Visited on 2022-12-29}
+}
+
+@online{kotlinlang,
+  author = {JetBrains s.r.o.},
+  title = {Kotlin},
+  year = 2010,
+  url = {https://kotlinlang.org/},
+  note = {Visited on 2022-12-29}
+}
+
+@online{kotlin5years,
+  author = {Android Developers},
+  title = {Celebrating 5 years of Kotlin on Android },
+  year = 2022,
+  url = {https://android-developers.googleblog.com/2022/08/celebrating-5-years-of-kotlin-on-android.html},
+  note = {Visited on 2022-12-29}
+}
+
+@online{sosurvey2016,
+  author = {Stack Overflow},
+  title = {Stack Overflow 2016 Developer Survey},
+  year = 2016,
+  url = {https://insights.stackoverflow.com/survey/2016},
+  note = {Visited on 2022-12-29}
+}
+
+@online{sosurvey2022,
+  author = {Stack Overflow},
+  title = {Stack Overflow 2022 Developer Survey},
+  year = 2022,
+  url = {https://survey.stackoverflow.co/2022/#most-popular-technologies-language},
+  note = {Visited on 2022-12-29}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Background
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%% Software testing
+@inproceedings{jamil2016software,
+  title={Software testing techniques: A literature review},
+  author={Jamil, Muhammad Abid and Arif, Muhammad and Abubakar, Normi Sham Awang and Ahmad, Akhlaq},
+  booktitle={2016 6th international conference on information and communication technology for the Muslim world (ICT4M)},
+  pages={177--182},
+  year={2016},
+  organization={IEEE}
+}
+
+@inproceedings{daka2014survey,
+  title={A survey on unit testing practices and problems},
+  author={Daka, Ermira and Fraser, Gordon},
+  booktitle={2014 IEEE 25th International Symposium on Software Reliability Engineering},
+  pages={201--211},
+  year={2014},
+  organization={IEEE}
+}
+
+@inproceedings{leung1990study,
+  title={A study of integration testing and software regression at the integration level},
+  author={Leung, Hareton KN and White, Lee},
+  booktitle={Proceedings. Conference on Software Maintenance 1990},
+  pages={290--301},
+  year={1990},
+  organization={IEEE}
+}
+
+% Test co-evolution
+@article{zaidman2011studying,
+  title={Studying the co-evolution of production and test code in open source and industrial developer test processes through repository mining},
+  author={Zaidman, Andy and Van Rompaey, Bart and Van Deursen, Arie and Demeyer, Serge},
+  journal={Empirical Software Engineering},
+  volume={16},
+  number={3},
+  pages={325--364},
+  year={2011},
+  publisher={Springer}
+}
+
+
+%%%%%%%%%%%%%%%%%% Fuzzing
+
+% Fuzzing survey
+% https://arxiv.org/pdf/1812.00140.pdf
+@article{manes2019art,
+  title={The art, science, and engineering of fuzzing: A survey},
+  author={Man{\`e}s, Valentin JM and Han, HyungSeok and Han, Choongwoo and Cha, Sang Kil and Egele, Manuel and Schwartz, Edward J and Woo, Maverick},
+  journal={IEEE Transactions on Software Engineering},
+  volume={47},
+  number={11},
+  pages={2312--2331},
+  year={2019},
+  publisher={IEEE}
+}
+
+% Another survey
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=8371326
+@article{liang2018fuzzing,
+  title={Fuzzing: State of the art},
+  author={Liang, Hongliang and Pei, Xiaoxiao and Jia, Xiaodong and Shen, Wuwei and Zhang, Jian},
+  journal={IEEE Transactions on Reliability},
+  volume={67},
+  number={3},
+  pages={1199--1218},
+  year={2018},
+  publisher={IEEE}
+}
+
+% https://arxiv.org/pdf/1906.11133.pdf
+% Taxonomy
+@article{saavedra2019review,
+  title={A review of machine learning applications in fuzzing},
+  author={Saavedra, Gary J and Rodhouse, Kathryn N and Dunlavy, Daniel M and Kegelmeyer, Philip W},
+  journal={arXiv preprint arXiv:1906.11133},
+  year={2019}
+}
+
+% Taxonomy
+% https://dl.acm.org/doi/pdf/10.1145/3512345
+@article{zhu2022fuzzing,
+  title={Fuzzing: a survey for roadmap},
+  author={Zhu, Xiaogang and Wen, Sheng and Camtepe, Seyit and Xiang, Yang},
+  journal={ACM Computing Surveys (CSUR)},
+  volume={54},
+  number={11s},
+  pages={1--36},
+  year={2022},
+  publisher={ACM New York, NY}
+}
+
+% Random Testing
+% https://dl.acm.org/doi/pdf/10.5555/800078.802530
+@inproceedings{duran1981report,
+  title={A report on random testing},
+  author={Duran, Joe W and Ntafos, Simeon},
+  booktitle={ICSE},
+  volume={81},
+  pages={179--183},
+  year={1981},
+  organization={Citeseer}
+}
+
+% Adaptive Random Testing
+% https://reader.elsevier.com/reader/sd/pii/S0164121209000405?token=E32A8F01340C6DF8162936E9A99F1EE2A56AE8A8940FF6D12EA8D1BAF1987BAE734AABCBDE16FA46D0B5C93352D4FAD9&originRegion=eu-west-1&originCreation=20230104212835
+@article{chen2010adaptive,
+  title={Adaptive random testing: The art of test case diversity},
+  author={Chen, Tsong Yueh and Kuo, Fei-Ching and Merkel, Robert G and Tse, TH},
+  journal={Journal of Systems and Software},
+  volume={83},
+  number={1},
+  pages={60--66},
+  year={2010},
+  publisher={Elsevier}
+}
+
+
+
+% Original paper
+@article{miller1990empirical,
+  title={An empirical study of the reliability of UNIX utilities},
+  author={Miller, Barton P and Fredriksen, Lars and So, Bryan},
+  journal={Communications of the ACM},
+  volume={33},
+  number={12},
+  pages={32--44},
+  year={1990},
+  publisher={ACM New York, NY, USA}
+}
+
+
+@article{panichella2017automated,
+  title={Automated test case generation as a many-objective optimisation problem with dynamic selection of the targets},
+  author={Panichella, Annibale and Kifetew, Fitsum Meshesha and Tonella, Paolo},
+  journal={IEEE Transactions on Software Engineering},
+  volume={44},
+  number={2},
+  pages={122--158},
+  year={2017},
+  publisher={IEEE}
+}
+
+@article{tonella2004evolutionary,
+  title={Evolutionary testing of classes},
+  author={Tonella, Paolo},
+  journal={ACM SIGSOFT Software Engineering Notes},
+  volume={29},
+  number={4},
+  pages={119--128},
+  year={2004},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{arcuri2019restful,
+  title={RESTful API automated test case generation with EvoMaster},
+  author={Arcuri, Andrea},
+  journal={ACM Transactions on Software Engineering and Methodology (TOSEM)},
+  volume={28},
+  number={1},
+  pages={1--37},
+  year={2019},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{girgis2005automatic,
+  title={Automatic test data generation for data flow testing using a genetic algorithm.},
+  author={Girgis, Moheb R},
+  journal={J. Univers. Comput. Sci.},
+  volume={11},
+  number={6},
+  pages={898--915},
+  year={2005}
+}
+
+
+
+% Black box
+@book{beizer1995black,
+  title={Black-box testing: techniques for functional testing of software and systems},
+  author={Beizer, Boris},
+  year={1995},
+  publisher={John Wiley \& Sons, Inc.}
+}
+
+%%%%%%%%%%%%%%%% SBST
+% Importance of software testing, challenges, categories
+@article{anand2013orchestrated,
+  title={An orchestrated survey of methodologies for automated software test case generation},
+  author={Anand, Saswat and Burke, Edmund K and Chen, Tsong Yueh and Clark, John and Cohen, Myra B and Grieskamp, Wolfgang and Harman, Mark and Harrold, Mary Jean and McMinn, Phil and Bertolino, Antonia and others},
+  journal={Journal of Systems and Software},
+  volume={86},
+  number={8},
+  pages={1978--2001},
+  year={2013},
+  publisher={Elsevier}
+}
+
+% Challenges of ST
+@article{mcminn2004search,
+  title={Search-based software test data generation: a survey},
+  author={McMinn, Phil},
+  journal={Software testing, Verification and reliability},
+  volume={14},
+  number={2},
+  pages={105--156},
+  year={2004},
+  publisher={Wiley Online Library}
+}
+
+@inproceedings{mcminn2011search,
+  title={Search-based software testing: Past, present and future},
+  author={McMinn, Phil},
+  booktitle={2011 IEEE Fourth International Conference on Software Testing, Verification and Validation Workshops},
+  pages={153--163},
+  year={2011},
+  organization={IEEE}
+}
+
+% Burdens of traditional ST
+@article{candea2019automated,
+  title={Automated software test generation: some challenges, solutions, and recent advances},
+  author={Candea, George and Godefroid, Patrice},
+  journal={Computing and Software Science},
+  pages={505--531},
+  year={2019},
+  publisher={Springer}
+}
+
+% Definition and role of ST
+@article{umar2020comprehensive,
+  title={Comprehensive study of software testing: Categories, levels, techniques, and types},
+  author={Umar, Mubarak Albarka},
+  year={2020},
+  publisher={TechRxiv}
+}
+
+% Software evolution
+@article{lehman1979understanding,
+  title={On understanding laws, evolution, and conservation in the large-program life cycle},
+  author={Lehman, Meir M},
+  journal={Journal of Systems and Software},
+  volume={1},
+  pages={213--221},
+  year={1979},
+  publisher={Elsevier}
+}
+
+% SBSE
+@article{harman2001search,
+  title={Search-based software engineering},
+  author={Harman, Mark and Jones, Bryan F},
+  journal={Information and software Technology},
+  volume={43},
+  number={14},
+  pages={833--839},
+  year={2001},
+  publisher={Elsevier}
+}
+
+% Symbolic execution
+@article{king1975new,
+  title={A new approach to program testing},
+  author={King, James C},
+  journal={ACM Sigplan Notices},
+  volume={10},
+  number={6},
+  pages={228--233},
+  year={1975},
+  publisher={ACM New York, NY, USA}
+}
+
+% Tabu search
+@article{glover1990tabu,
+  title={Tabu search: A tutorial},
+  author={Glover, Fred},
+  journal={Interfaces},
+  volume={20},
+  number={4},
+  pages={74--94},
+  year={1990},
+  publisher={INFORMS}
+}
+
+% SA
+@article{kirkpatrick1983optimization,
+  title={Optimization by simulated annealing},
+  author={Kirkpatrick, Scott and Gelatt Jr, C Daniel and Vecchi, Mario P},
+  journal={science},
+  volume={220},
+  number={4598},
+  pages={671--680},
+  year={1983},
+  publisher={American association for the advancement of science}
+}
+
+% Original SBST paper
+@article{miller1976automatic,
+  title={Automatic generation of floating-point test data},
+  author={Miller, Webb and Spooner, David L.},
+  journal={IEEE Transactions on Software Engineering},
+  number={3},
+  pages={223--226},
+  year={1976},
+  publisher={IEEE}
+}
+
+% EA popularity in SBST	
+@article{harman2011software,
+  title={Software engineering meets evolutionary computation},
+  author={Harman, Mark},
+  journal={Computer},
+  volume={44},
+  number={10},
+  pages={31--39},
+  year={2011},
+  publisher={IEEE Computer Society}
+}
+
+% John Holland
+@article{jh1975adaptation,
+  title={Adaptation in natural and artificial systems},
+  author={John, Holland},
+  journal={Ann Arbor},
+  year={1975},
+  publisher={The University of Michigan Press}
+}
+
+@article{turing1950computing,
+  title={Computing machinery and intelligence},
+  author={Turing, Alan M and Haugeland, J},
+  journal={The Turing Test: Verbal Behavior as the Hallmark of Intelligence},
+  pages={29--56},
+  year={1950}
+}
+
+
+
+
+%%%%%%%%%%%%%% Fuzzing applications
+
+@inproceedings{dolan2009robust,
+  title={Robust signatures for kernel data structures},
+  author={Dolan-Gavitt, Brendan and Srivastava, Abhinav and Traynor, Patrick and Giffin, Jonathon},
+  booktitle={Proceedings of the 16th ACM conference on Computer and communications security},
+  pages={566--577},
+  year={2009}
+}
+
+@inproceedings{stephens2016driller,
+  title={Driller: Augmenting fuzzing through selective symbolic execution.},
+  author={Stephens, Nick and Grosen, John and Salls, Christopher and Dutcher, Andrew and Wang, Ruoyu and Corbetta, Jacopo and Shoshitaishvili, Yan and Kruegel, Christopher and Vigna, Giovanni},
+  booktitle={NDSS},
+  volume={16},
+  number={2016},
+  pages={1--16},
+  year={2016}
+}
+
+@article{oehlert2005violating,
+  title={Violating assumptions with fuzzing},
+  author={Oehlert, Peter},
+  journal={IEEE Security \& Privacy},
+  volume={3},
+  number={2},
+  pages={58--62},
+  year={2005},
+  publisher={IEEE}
+}
+
+% REST API fuzzing
+@inproceedings{atlidakis2019restler,
+  title={Restler: Stateful rest api fuzzing},
+  author={Atlidakis, Vaggelis and Godefroid, Patrice and Polishchuk, Marina},
+  booktitle={2019 IEEE/ACM 41st International Conference on Software Engineering (ICSE)},
+  pages={748--758},
+  year={2019},
+  organization={IEEE}
+}
+
+% REST API fuzzing
+@inproceedings{godefroid2020intelligent,
+  title={Intelligent REST API data fuzzing},
+  author={Godefroid, Patrice and Huang, Bo-Yuan and Polishchuk, Marina},
+  booktitle={Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering},
+  pages={725--736},
+  year={2020}
+}
+
+% DBMS testing
+@inproceedings{zhong2020squirrel,
+  title={Squirrel: Testing database management systems with language validity and coverage feedback},
+  author={Zhong, Rui and Chen, Yongheng and Hu, Hong and Zhang, Hangfan and Lee, Wenke and Wu, Dinghao},
+  booktitle={Proceedings of the 2020 ACM SIGSAC Conference on Computer and Communications Security},
+  pages={955--970},
+  year={2020}
+}
+
+% HC for TSP
+@article{lin1965computer,
+  title={Computer solutions of the traveling salesman problem},
+  author={Lin, Shen},
+  journal={Bell System Technical Journal},
+  volume={44},
+  number={10},
+  pages={2245--2269},
+  year={1965},
+  publisher={Wiley Online Library}
+}
+
+% HC
+@article{selman2006hill,
+  title={Hill-climbing search},
+  author={Selman, Bart and Gomes, Carla P},
+  journal={Encyclopedia of cognitive science},
+  volume={81},
+  pages={82},
+  year={2006},
+  publisher={John Wiley \& Sons, Ltd Chichester}
+}
+
+% Oracle problem
+@article{barr2014oracle,
+  title={The oracle problem in software testing: A survey},
+  author={Barr, Earl T and Harman, Mark and McMinn, Phil and Shahbaz, Muzammil and Yoo, Shin},
+  journal={IEEE transactions on software engineering},
+  volume={41},
+  number={5},
+  pages={507--525},
+  year={2014},
+  publisher={IEEE}
+}
+
+@article{sipser1996introduction,
+  title={Introduction to the Theory of Computation},
+  author={Sipser, Michael},
+  journal={ACM Sigact News},
+  volume={27},
+  number={1},
+  pages={27--29},
+  year={1996},
+  publisher={ACM New York, NY, USA}
+}
+
+@inproceedings{steinhofel2022input,
+  title={Input Invariants},
+  author={Steinh{\"o}fel, Dominic and Zeller, Andreas},
+  booktitle={ESEC/FSE 2022: Proceedings of the 30th ACM Joint European Software Engineering Conference and Symposium on the Foundations of Software Engineering},
+  pages={583–-594},
+  year={2022}
+}
+
+@article{hindle2016naturalness,
+  title={On the naturalness of software},
+  author={Hindle, Abram and Barr, Earl T and Gabel, Mark and Su, Zhendong and Devanbu, Premkumar},
+  journal={Communications of the ACM},
+  volume={59},
+  number={5},
+  pages={122--131},
+  year={2016},
+  publisher={ACM New York, NY, USA}
+}
+
+% Skeletal program enumeration
+@inproceedings{zhang2017skeletal,
+  title={Skeletal program enumeration for rigorous compiler testing},
+  author={Zhang, Qirun and Sun, Chengnian and Su, Zhendong},
+  booktitle={Proceedings of the 38th ACM SIGPLAN Conference on Programming Language Design and Implementation},
+  pages={347--361},
+  year={2017}
+}
+
+@inproceedings{han2019codealchemist,
+  title={CodeAlchemist: Semantics-Aware Code Generation to Find Vulnerabilities in JavaScript Engines.},
+  author={Han, HyungSeok and Oh, DongHyeon and Cha, Sang Kil},
+  booktitle={NDSS},
+  year={2019}
+}
+
+
+@inproceedings{kreutzer2020language,
+  title={Language-agnostic generation of compilable test programs},
+  author={Kreutzer, Patrick and Kraus, Stefan and Philippsen, Michael},
+  booktitle={2020 IEEE 13th International Conference on Software Testing, Validation and Verification (ICST)},
+  pages={39--50},
+  year={2020},
+  organization={IEEE}
+}
+
+@article{parr2013definitive,
+  title={The definitive ANTLR 4 reference},
+  author={Parr, Terence},
+  journal={The Definitive ANTLR 4 Reference},
+  pages={1--326},
+  year={2013},
+  publisher={The Pragmatic Bookshelf}
+}
+
+@online{kotlink2,
+  author = {Roman Elizarov},
+  title = {The K2 Compiler Is Going Stable in Kotlin 2.0},
+  year = 2023,
+  url = {https://blog.jetbrains.com/kotlin/2023/02/k2-kotlin-2-0/},
+  note = {Visited on 2023-06-17}
+}
+
+@online{kotlingrammar,
+  author = {JetBrains},
+  title = {Kotlin Grammar Specification},
+  year = 2023,
+  url = {https://kotlinlang.org/docs/reference/grammar.html},
+  note = {Visited on 2023-06-17}
+}
+
+@article{lu2021codexglue,
+  title={Codexglue: A machine learning benchmark dataset for code understanding and generation},
+  author={Lu, Shuai and Guo, Daya and Ren, Shuo and Huang, Junjie and Svyatkovskiy, Alexey and Blanco, Ambrosio and Clement, Colin and Drain, Dawn and Jiang, Daxin and Tang, Duyu and others},
+  journal={arXiv preprint arXiv:2102.04664},
+  year={2021}
+}
+
+@article{vaswani2017attention,
+  title={Attention is all you need},
+  author={Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  journal={Advances in neural information processing systems},
+  volume={30},
+  year={2017}
+}
+
+@article{feng2020codebert,
+  title={Codebert: A pre-trained model for programming and natural languages},
+  author={Feng, Zhangyin and Guo, Daya and Tang, Duyu and Duan, Nan and Feng, Xiaocheng and Gong, Ming and Shou, Linjun and Qin, Bing and Liu, Ting and Jiang, Daxin and others},
+  journal={arXiv preprint arXiv:2002.08155},
+  year={2020}
+}
+
+% LS better than RS, worse than GA
+@inproceedings{arcuri2009theoretical,
+  title={Theoretical analysis of local search in software testing},
+  author={Arcuri, Andrea},
+  booktitle={International Symposium on Stochastic Algorithms},
+  pages={156--168},
+  year={2009},
+  organization={Springer}
+}
+
+% LS worse than GS
+@inproceedings{harman2007theoretical,
+  title={A theoretical \& empirical analysis of evolutionary testing and hill climbing for structural test data generation},
+  author={Harman, Mark and McMinn, Phil},
+  booktitle={Proceedings of the 2007 international symposium on Software testing and analysis},
+  pages={73--83},
+  year={2007}
+}
+
+% Differntial testing
+@article{mckeeman1998differential,
+  title={Differential testing for software},
+  author={McKeeman, William M},
+  journal={Digital Technical Journal},
+  volume={10},
+  number={1},
+  pages={100--107},
+  year={1998}
+}
+
+@incollection{deb2013multi,
+  title={Multi-objective optimization},
+  author={Deb, Kalyanmoy and Deb, Kalyanmoy},
+  booktitle={Search methodologies: Introductory tutorials in optimization and decision support techniques},
+  pages={403--449},
+  year={2013},
+  publisher={Springer}
+}blisher={IEEE}
+}
+
+@article{fraser2012whole,
+  title={Whole test suite generation},
+  author={Fraser, Gordon and Arcuri, Andrea},
+  journal={IEEE Transactions on Software Engineering},
+  volume={39},
+  number={2},
+  pages={276--291},
+  year={2012},
+  publisher={IEEE}
+}
+
+@article{ankerst1999optics,
+  title={OPTICS: Ordering points to identify the clustering structure},
+  author={Ankerst, Mihael and Breunig, Markus M and Kriegel, Hans-Peter and Sander, J{\"o}rg},
+  journal={ACM Sigmod record},
+  volume={28},
+  number={2},
+  pages={49--60},
+  year={1999},
+  publisher={ACM New York, NY, USA}
+}
+
+@article{zhang1996birch,
+  title={BIRCH: an efficient data clustering method for very large databases},
+  author={Zhang, Tian and Ramakrishnan, Raghu and Livny, Miron},
+  journal={ACM sigmod record},
+  volume={25},
+  number={2},
+  pages={103--114},
+  year={1996},
+  publisher={ACM New York, NY, USA}
+}
+

@@ -1,31 +1,116 @@
-\documentclass[twoside,a4paper,11pt]{memoir}
+\documentclass[twoside,a4paper,11pt,openany]{memoir}
 \usepackage{a4}
 \usepackage{times}
 \usepackage{pslatex}
 \usepackage{url}
+\usepackage{amsmath,amsfonts,amssymb}
 \usepackage{mscthesis}
 \usepackage{lipsum} % standard filler text, only needed for demo
-
+\usepackage{tikz,pgffor}
+\usetikzlibrary{positioning,shapes.arrows,arrows.meta,shadows}
+%\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 % %% The package 'algorithm' is useful, but incompatible with memoir.
 % %% Cor-Paul Bezemer / http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
 % %% suggest the following fix:
-\let\newfloat\undefined \usepackage{algorithmic} 
-\usepackage{algorithm}
+%\let\newfloat\undefined \usepackage{algorithmic} 
+%\usepackage{algorithm}
 
 % Include right (LaTeX/PDFLaTeX) graphics package
 % (doesn't work under cygwin apperently)
 %\ifx\pdftexversion\undefined
-\usepackage[dvips]{graphicx}
-\usepackage[dvips]{color}
+%\usepackage[dvips]{graphicx}
+%\usepackage[dvips]{color}
+%\usepackage{xcolor,pifont}
+
+%\usepackage[dvipsnames]{xcolor}
+\colorlet{gray1}{gray!40!black}
+\colorlet{gray2}{gray!80!black}
+\usepackage{listings}
+\usepackage{subfigure}
+\tikzset{XOR/.style={draw,circle,append after command={
+        [shorten >=\pgflinewidth, shorten <=\pgflinewidth,]
+        (\tikzlastnode.north) edge (\tikzlastnode.south)
+        (\tikzlastnode.east) edge (\tikzlastnode.west)
+        }
+    }
+}
+\tikzset{line/.style={draw, -latex',shorten <=1bp,shorten >=1bp}}
+
+\lstdefinelanguage{Kotlin}{
+  comment=[l]{//},
+  commentstyle={\color{gray}\ttfamily},
+  emph={filter, first, firstOrNull, forEach, lazy, map, mapNotNull, println},
+  emphstyle={\color{OrangeRed}},
+  identifierstyle=\color{black},
+  keywords={!in, !is, abstract, actual, annotation, as, as?, break, by, catch, class, companion, const, constructor, continue, crossinline, data, delegate, do, dynamic, else, enum, expect, external, false, field, file, final, finally, for, fun, get, if, import, in, infix, init, inline, inner, interface, internal, is, lateinit, noinline, null, object, open, operator, out, override, package, param, private, property, protected, public, receiveris, reified, return, return@, sealed, set, setparam, super, suspend, tailrec, this, throw, true, try, typealias, typeof, val, var, vararg, when, where, while},
+  keywordstyle={\color{NavyBlue}\bfseries},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]",
+  morestring=[s]{"""*}{*"""},
+  ndkeywords={@Deprecated, @JvmField, @JvmName, @JvmOverloads, @JvmStatic, @JvmSynthetic, Array, Byte, Double, Float, Int, Integer, Iterable, Long, Runnable, Short, String, Any, Unit, Nothing},
+  ndkeywordstyle={\color{BurntOrange}\bfseries},
+  sensitive=true,
+  stringstyle={\color{ForestGreen}\ttfamily},
+}
+
+
+% Colors
+% Corporate colors
+\definecolor{tudCyan}{RGB}{61,152,222}
+\definecolor{tudBlack}{RGB}{0,0,0}
+\definecolor{tudWhite}{RGB}{255,255,255}
+\definecolor{BurntOrange}{RGB}{204,85,0}
+\definecolor{NavyBlue}{RGB}{0,0,128}
+
+% Basic colors
+\definecolor{tudSeaGreen}{RGB}{111,189,165}
+\definecolor{tudGreen}{RGB}{39,131,142}
+\definecolor{tudDarkBlue}{RGB}{34,70,122}
+\definecolor{tudPurple}{RGB}{36,46,131}
+\definecolor{tudTurquoise}{RGB}{50,154,179}
+\definecolor{tudSkyBlue}{RGB}{130,187,206}
+
+% Accent colors
+\definecolor{tudLavender}{RGB}{121,150,180}
+\definecolor{tudOrange}{RGB}{216,130,62}
+\definecolor{tudWarmPurple}{RGB}{110,50,122}
+\definecolor{tudFuchsia}{RGB}{178,72,146}
+\definecolor{tudBrightGreen}{RGB}{183,200,34}
+\definecolor{tudYellow}{RGB}{247,234,151}
+
+\definecolor{customBlockColor}{RGB}{200,228,250}
+\definecolor{customAlertColor}{RGB}{31,112,173}
+
+\definecolor{myblue}{rgb}{0.29,0.5,0.74}
+\definecolor{myred}{rgb}{0.73,0.32,0.3}
+\definecolor{mygreen}{rgb}{0.59,0.73,0.34}
+\definecolor{myviolet}{rgb}{0.49,0.39,0.62}
+\definecolor{myturquoise}{rgb}{0.28,0.67,0.76}
+\definecolor{myorange}{rgb}{0.97,0.58,0.27}
+\usepackage{chngcntr}
+\counterwithin{figure}{chapter}
+
+\usepackage{parskip}
+\setlength{\parskip}{0pt}
 %\else
 %\usepackage[pdftex]{graphicx}
 %\usepackage[pdftex]{color}
 %\fi
 
-\usepackage{hyperref}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage[acronym]{glossaries}
+\makeglossaries
+\setglossarysection{chapter}
 
 % Used in the bibliography to enable \citeauthor{citation}
 \usepackage[numbers]{natbib}
+%\usepackage{algpseudocode,algorithm,algorithmicx}
+%\usepackage{algpseudocode}
+%\usepackage{algorithm} 
+%\usepackage{algorithmicx}
+\newcommand*\DNA{\textsc{dna}}
+
+\newcommand*\Let[2]{#1 $\leftarrow$ #2}
 
 % Ensure that urls longer than the page width are broken up
 % Based on the answer of StackOverflow user "xamde":
@@ -37,12 +122,13 @@
   \do\E\do\F\do\G\do\H\do\I\do\J\do\K\do\L\do\M\do\N%
   \do\O\do\P\do\Q\do\R\do\S\do\T\do\U\do\V\do\W\do\X%
   \do\Y\do\Z}
+  
 
 %---------------------------------------------------------------------%
 %                     Options                                         %    
 %---------------------------------------------------------------------%
 
-\title{Software Engineering Research Group \\MSc Thesis Style}
+\title{Test Program-Based Generative\\ Fuzzing for Differential Testing \\of the Kotlin Compiler}
 \subtitle{Version of \today}
 % The final version of your thesis should typically use a different
 % subtitle without the current date, for example
@@ -50,33 +136,33 @@
 % or remove the subtitle by uncommenting the following line: 
 %\subtitle{}
 
-\author{Leon Moonen}                               % CHANGE TO YOUR NAME
-\authoremail{\url{Leon.Moonen@computer.org}}       % CHANGE TO YOUR EMAIL ADDRESS
-\birthplace{Weert, the Netherlands}                % CHANGE TO YOUR BIRTH PLACE
-\studentid{123456789}                              % CHANGE TO YOUR STUDENT ID
+\author{C\u alin-Andrei Georgescu}                               % CHANGE TO YOUR NAME
+\authoremail{\url{caling@protonmail.com}}       % CHANGE TO YOUR EMAIL ADDRESS
+\birthplace{Bucharest, Romania}                % CHANGE TO YOUR BIRTH PLACE
+\studentid{123456}                              % CHANGE TO YOUR STUDENT ID
 
 % Optional for work done at a company, put this in comments if you did
 % not do your thesis work at a company
 \company{
-\includegraphics[height=2cm]{img/hilbert.ps}\\
-Some Company\\
-With it's address\\
-ThePlace, the Netherlands\\
-\url{www.url.nl}
+%\includegraphics[height=2cm]{img/hilbert.ps}\\
+JetBrains N.V.\\
+Huidekoperstraat 26-28\\
+1017 ZM Amsterdam, The Netherlands\\
+\url{https://www.jetbrains.com/}
 }
 
 % Optional (postscript) cover picture. Put this in comments when not needed.
-\coverpicture{\includegraphics[width=13cm]{img/maze.ps}}
+% \coverpicture{\includegraphics[width=13cm]{img/maze.ps}}
 
 
 % A copyright notice and maybe something about the cover picture
 % Put in comments to get the default copyright notice
-\colophon{\noindent
-  \copyright{} \the\year \: \theauthor. \emph{Note that this notice is for demonstration
-  purposes and that the \LaTeX{} style and document source are free to
-  use as basis for your MSc thesis.} \\[1em] 
-  Cover picture: A ``random'' maze generated in postscript.
-}
+%\colophon{\noindent
+%  \copyright{} \the\year \: \theauthor. \emph{Note that this notice is for demonstration
+%  purposes and that the \LaTeX{} style and document source are free to
+%  use as basis for your MSc thesis.} \\[1em] 
+%  Cover picture: A ``random'' maze generated in postscript.
+%}
 
 % thesis committee:
 \chair{Prof. Dr. A. van Deursen, Faculty EEMCS, TU Delft}
@@ -91,21 +177,28 @@ ThePlace, the Netherlands\\
 \setsecnumdepth{subsection}
 \maxsecnumdepth{subsection}
 
+
+\usepackage{hyperref}
+\usepackage{cleveref}
 \begin{document}
 \frontmatter
 \thispagestyle{empty}
 \maketitle                                      % for the cover page
 \makeformaltitlepages{\input{abstract}}         % for formal title pages with all info
 
-\include{preface}
+%\include{preface}
 
 \cleardoublepage\tableofcontents
 \cleardoublepage\listoffigures
 \cleardoublepage\mainmatter
-
 \include{introduction} 
-\include{chapter} 
+\include{background} 
 \include{related_work} 
+\include{algorithm}
+\include{tool}
+\include{empirical_study}
+\include{results}
+\include{discussion}
 \include{conclusions_and_future_work} 
 
 \bibliographystyle{plainnat}
@@ -114,6 +207,9 @@ ThePlace, the Netherlands\\
 \appendix
 \def\chaptername{Appendix}
 \include{appendix}
+
+
+
 \include{requirements}
 
 

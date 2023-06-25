@@ -1,0 +1,407 @@
+\chapter{\label{cha:background}Background} 
+
+This chapter establishes the theoretical basis
+required for investigating the aim introduced in
+Section \ref{sec:aim}.
+This includes the individual nuances of the Kotlin compiler,
+the encompassing field of software testing, and the theoretical
+background of fuzzing.
+In addition, this chapter lays a contextual and historical foundation
+required for the analysis of related work examined in Chapter \ref{cha:related}.
+
+\section{The Kotlin Compiler}
+
+%\newglossaryentry{formula}
+%{
+%        name=formula,
+%        description={A mathematical expression}
+%}
+%\Gls{formula}
+The Kotlin project began in 2010, with version \texttt{1.0} releasing
+officially releasing six years later \citep{stepanov2021type}.
+Following Google's decision to support it as an official Android
+programming language \cite{kotlin5years}, Kotlin's popularity increased drastically.
+This exceptional growth is perhaps best exemplified through
+StackOverflow's annual developer survey, which aggregates data from
+tens of thousands of active developers from varied backgrounds.
+This survey clearly showcases Kotlin's sharp ascent: the percentage of
+developers who actively use Kotlin increased from $0.12$ per cent in 2016
+to $9.16$ per cent in 2022 \citep{sosurvey2016, sosurvey2022}. 
+Such sustained growth brought both opportunities and challenges to the
+expanding community, which resulted in the development of increasingly
+complex and feature-rich tools.
+
+Such changes have not gone unnoticed by Kotlin developer
+community, who for the past seven years has introduced numerous
+changes to all parts of the language ecosystem to
+accommodate changes in the scope of the language.
+Inevitably, the compiler too must adapt to the adjustment
+in direction that the ecosystem is subject to.
+Perhaps one of the biggest changes to Kotlin as a whole
+is the upcoming release of version 2.0 of the language,
+complete with a sweeping re-write of the compiler frontend TODO citation.
+
+Code-named \texttt{K2}, the new version of the compiler seeks
+to increase performance and maintain backwards compatibility,
+all while entirely replacing the architecture of the current compile frontend.
+Naturally, any defects in the new compiler implementation
+could have drastic repercussions for Kotlin users, and the
+sheer size of the rewrite warrants extensive amounts of testing.
+The remainder of this study targets the testing of the new
+(experimental) implementation of the \texttt{K2} compiler
+against its previous counterpart, with the goal
+of uncovering defects that the introduction of \texttt{K2} brings with it.
+
+\newacronym{JVM}{JVM} {Java Virtual Machine}
+
+Though it supports several platforms, large portions of the Kotlin ecosystem pivots around
+the \Gls{JVM} system and its adjacent Java bytecode instruction set.
+Kotlin is one of several successful languages to leverage the \gls{JVM},
+together with Java, Scala, Clojure, and Groovy. 
+One can think of the \gls{JVM} as a compatibility layer
+between a Java bytecode input and a target-specific target language.
+The advantage of this system lies in the flexibility it affords
+language engineers.
+Leveraging the \gls{JVM} as an intermediate compilation step,
+language designers can focus on building a single compilation tool
+that targets Java bytecode.
+This approach delegates the task of machine code
+generation to the \gls{JVM} and frees compiler engineers from
+platform- and hardware-specific idiosyncrasies.
+This study focuses on testing the end-to-end compilat1ion pipeline
+of Kotlin through the open-source \texttt{kotlinc} utility.
+
+
+
+\newacronym{SDLC}{SDLC} {Software Development Lifecycle}
+\newacronym{SUT}{SUT} {System Under Test}
+\newacronym{WB}{WB} {White-Box}
+\newacronym{BB}{BB} {Black-Box}
+\newacronym{GB}{GB} {Grey-Box}
+\newacronym{UT}{UT} {Unit-Level Testing}
+\newacronym{IT}{IT} {Integration-Level Testing}
+\newacronym{ST}{ST} {System-Level Test}
+\newacronym{DT}{DT} {Differential Testing}
+
+\section{Software Testing}
+
+Testing is an integral component of the \gls{SDLC} \cite{jamil2016software}.
+At its core, software testing is the process of validating
+the behavior of a target \gls{SUT}. 
+Over time, specialized testing approaches have emerged as
+the practice of software engineering itself matured.
+To effectively navigate the numerous alternatives, we use the
+taxonomy established by \citet{umar2020comprehensive}.
+
+\subsubsection{Black-, White-, and Grey-Box Testing}
+
+A key characteristic of a testing strategy consists of 
+the requirements it imposes on the \gls{SUT}. 
+\Gls{WB} approaches require a full understanding of the target
+system, which often translates to unrestricted access to its source code.
+The information extracted through access to the system's structure
+and implementation often provides valuable guidance criteria.
+By contrast, \Gls{BB} approaches function without access to the underlying
+source code, which diminishes the amount of information they can exploit.
+This sacrifice, however, extends the applicability of \gls{BB} approaches 
+to a broader range of systems.
+\Gls{GB} approaches constitute a trade-off between the two 
+extremes, and assume access to a subset system components.
+This requires some level of understanding of the \gls{SUT}'s
+behavior, but imposes lesser constraints than \gls{WB} standards.
+
+\subsubsection{Unit-, Integration-, and System-Level Testing}
+
+Testing methods also differ in the degree to which they exercise the \gls{SUT}.
+Three main paradigms emerge from this distinction: 
+\Gls{UT}, \Gls{IT}, and \gls{ST}.
+\citet{daka2014survey} demarcate \gls{UT} as 
+generally small and automatically executable tests that aim
+to validate the correctness of small components (units) of the \gls{SUT}.
+\citet{leung1990study} establish \gls{IT} at a higher-level scope, targeting
+the integration of several smaller modules within a system.
+Finally, \citet{umar2020comprehensive} identifies \gls{ST} as tests
+that validate the entire system's compliance against its underlying
+requirements.
+
+\subsubsection{The Oracle Problem}
+
+Irrespective of access to the \gls{SUT}
+and its level of granularity, test cases must be capable
+of distinguishing between correct and faulty behavior.
+This challenge constitutes
+\textit{test oracle problem}, and its automation is among the 
+greatest obstacles in automating test case generation \citep{barr2014oracle}.
+Approaches like specification inference and regression testing offer
+approximate oracles that can partially automate this process.
+Originally proposed by \citet{mckeeman1998differential} in 1998, \Gls{DT}
+offers a compelling and versatile alternative, that uses different versions
+of the same \gls{SUT} to heuristically discover bugs.
+\gls{DT} identifies incorrect behavior when at least
+one version of the \gls{SUT} returns a result that differs from the others.
+While inexact in its nature, \gls{DT} has become popular
+in the field of compiler testing thanks to its lightweight 
+constraints, which increase its applicability to especially complex
+pieces of software.
+
+\section{Automated Test Case Generation}
+
+Traditional (manual) software testing poses several practical
+challenges, not least because of its imposing complexity.
+\citet{candea2019automated} regard testing as the most
+demanding and laborious task in the \gls{SDLC}.
+\citet{lehman1979understanding} established that to maintain
+relevance, software systems must adapt, while \citet{zaidman2011studying}
+showed that test suites often evolve in tandem with their code bases.
+These findings suggest that to adequately test an evolving system,
+practitioners not only allocate significant resources to writing test cases,
+but also do so throughout the software's lifetime.
+In an effort to alleviate the human effort that testing requires,
+researchers developed a plethora of automated test case generation methods.
+The remainder of this section briefly covers the most prevalent techniques
+in this field.
+
+\newacronym{OS}{OS} {Operating System}
+\newacronym{RT}{RT} {Random Testing}
+\newacronym{ART}{ART} {Adaptive Random Testing}
+
+\subsection{Fuzzing}
+
+\citet{miller1990empirical} coined the term \textit{fuzz} in 1979 referring
+to a program capable of generating a stream of random characters.
+This program served as a means of assessing
+the reliability of several tools that were part of the Unix \Gls{OS}.
+At its core, fuzzing is perhaps the simplest possible implementation
+of input generation: the \textit{fuzzer} simply samples data
+driven by a pseudo-random random generator and executes
+the target program with the generated input.
+This original formulation of fuzzing bears a close
+resemblance to well established test case generation algorithms
+such as \Gls{RT} \cite{duran1981report} and 
+its descendant, \Gls{ART} \cite{chen2010adaptive}.
+Nonetheless, fuzzing is a straight-forward and deceptively effective 
+tool for defect discovery, which led it to become one
+of the most prevalent techniques in the field of test case generation.
+
+Since its inception, the meaning of fuzzing has adapted to
+better accommodate the extensive domain of applications that
+benefited from its application.
+Such applications include security testing \cite{oehlert2005violating, stephens2016driller},
+data structure signature generation \cite{dolan2009robust}, 
+database system management testing \cite{zhong2020squirrel},
+and REST API testing \cite{atlidakis2019restler, godefroid2020intelligent}.
+To encapsulate the various complexities that fuzzing has grown
+to exhibit, \citet{manes2019art} define fuzzing as the execution
+of the \gls{SUT} using input sampled from an input space protruding
+that of the \gls{SUT}'s.
+\citet{saavedra2019review} adopt a similar definition and additionally
+establish a taxonomy, that distinguishes between three 
+fundamental fuzzing paradigms:
+
+\begin{itemize}
+\item \textbf{Mutation-based fuzzers}~rely on predefined input (seeds),
+which they manipulate in heuristic ways to better cover that \gls{SUT}'s input space.
+The performance of these approaches is often heavily correlated
+with the quality of the corpus of seed inputs as the main source
+of expliting program knowledge.
+
+
+\item \textbf{Generation-based fuzzers}~sample the input space
+guided by an a-priori configuration or specification of the \gls{SUT}.
+Such approaches are generally more sophisticated than their mutation-based
+counterparts, which they tend to outperform \cite{saavedra2019review}.
+However, these benefits come at the cost of complexity and
+adherence to the limitations provided through the configuration.
+
+\item \textbf{Evolutionary fuzzers}~ employ evolutionary computation
+techniques, including fitness evaluation, mutation, crossover, and selection,
+to iteratively improve the quality of a set of solutions.
+These algorithms benefit from the rich literature surrounding
+evolutionary computation and may be better suited at exploring
+specific volumes of the search space.
+Evolutionary fuzzers impose an additional requirement on the \gls{SUT},
+namely that it must be capable of meaningfully evaluating generated input.
+\end{itemize}
+
+\newacronym{SBSE}{SBSE} {Search-Based Software Engineering}
+\newacronym{SBST}{SBST} {Search-Based Software Testing}
+
+\subsection{Search-Based Software Testing}
+
+Software engineering entails numerous problems that present
+nuanced, multivariate, and often conflicting objectives.
+Metaheuristic search algorithms lend themselves naturally
+as frameworks for effectively exploring the space of possible
+solutions with the aim of finding (near-)optimal candidates \cite{harman2001search}.
+The study and application of metaheuristics to software-centric tasks
+has brought forth many state-of-the-art approaches, and is jointly known
+as \Gls{SBSE}.
+Approaches fixating on the testing phase of the \gls{SDLC}
+belong to the \gls{SBST} branch of \gls{SBSE}.
+
+Search-based methods generally involve more sophisticated
+mechanisms than fuzzing.
+Irrespective of the problem, a notion of \textit{fitness}
+allows the comparison of any two (valid) solutions
+on the basis of at least one \textit{objective}.
+In the realm of \gls{SBST}, solutions may consist
+of test cases, and the corresponding fitness
+of a solution may be determined on the structural
+coverage a solution (test case) achieves, with the 
+underlying objective of uncovering bugs.
+Search algorithms often change solutions by means of \textit{mutation}.
+Mutation operators introduce small, possibly stochastic perturbations
+to alter the representation of a candidate, implicitly
+equipping the search space with a \textit{topology}.
+Over the years, researchers developed successful variations
+of this high-level framework, which in many cases are able
+to satisfactorily solve combinatorial
+problems in reasonable time \citep{mcminn2011search}.
+The remainder of this subsection coarsely examines
+some of the most widespread metaheuristic search approaches
+and grounds them through an \gls{SBST} lens.
+\newacronym{HC}{HC} {Hill Climbing}
+\newacronym{LS}{LS} {Local Search}
+\newacronym{SA}{SA} {Simulated Annealing}
+\newacronym{TS}{TS} {Tabu Search}
+
+\subsubsection{Local Search Metaheuristics}
+
+\Gls{LS} is among the most straight-forward
+metaheuristic frameworks.
+\Gls{HC} is a simple implementation of \gls{LS}, 
+that greedily exploits the neighborhood structure 
+of a solution.
+It consists of an iterated procedure that repeatedly
+attempts to improve a solution by applying mutations \cite{selman2006hill}.
+If the mutated candidate exceeds the fitness of the previous
+solution, the former replaces the latter, concluding the iteration.
+This basic strategy has been an effective tool for 
+solving combinatorial problems for over half a century \cite{lin1965computer}.
+Both greedy and stochastic variations of \gls{LS} exist, providing 
+compromises between the quality of the final solution
+and the time to convergence.
+From an \gls{SBST} perspective, \citet{arcuri2009theoretical} shows
+that \gls{LS} asymptotically outperforms \gls{RT}, but falls short of 
+more sophisticated global search techniques.
+\citet{harman2007theoretical} further reinforce this hierarchy with
+empirical evidence.
+
+\citet{miller1976automatic} have demonstrated the
+first application of \gls{HC} in automated test data generation in 1976.
+Since then, researchers developed several variations of the 
+\gls{LS} framework, such as \Gls{TS} \cite{glover1990tabu} and \Gls{SA}.
+Introduced by \citet{kirkpatrick1983optimization} in 1983, \gls{SA}
+finds its inspiration in statistical mechanics.
+\gls{SA} behaves similarly to \gls{LS}, but
+additionally incorporates an annealing mechanic that enables
+the stochastic exploration of candidates that exhibit a lower
+fitness than previous solutions.
+A cooling schedule governs this mechanisms, which generally encourages
+a broader exploration of the domain early in the search procedure.
+
+\newacronym{GS}{GS} {Global Search}
+\newacronym{EA}{EA} {Evolutionary Algorithms}
+\newacronym{GA}{GA} {Genetic Algorithms}
+\newacronym{GP}{GP} {Genetic Programming}
+
+\subsubsection{Evolutionary Algorithms}
+
+While \gls{LS} and its variants
+provide useful optimization frameworks, \Gls{GS} techniques often
+enable more effective and robust domain sampling mechanisms \cite{mcminn2004search}.
+Of the many \gls{GS} search algorithms developed over the years, \Gls{EA} have gained
+the most notoriety within the \gls{SBSE} community \cite{harman2011software}.
+
+\gls{EA}s are widely applicable and robust, population-based algorithms
+that practitioners have employed in a broad range of engineering tasks \cite{harman2011software}.
+Though its conceptual origins trace back to Alan Turing's "\textit{Computing Machinery and Intelligence}" \cite{turing1950computing}, it was John Holland \cite{jh1975adaptation}
+who in 1975 formalized and cemented the modern \gls{EA} paradigm.
+A plethora of specialized \gls{EA}s have emerged from a vast spectrum of 
+research domains, but arguably the most widespread variation is the
+class of \Gls{GA}.
+\Cref{alg:sga} provides the pseudocode for the simple \gls{GA}
+proposed by Holland.
+This constitutes the foundation of specialized automated test case generation algorithms
+for several tasks, including unit testing 
+\cite{tonella2004evolutionary, panichella2017automated},
+data flow testing \cite{girgis2005automatic}, and REST API testing
+\cite{arcuri2019restful}.
+Biology-inspired by nature, standard \gls{GA} formulations share several core ingredients:
+\begin{itemize}
+\item A \textit{representation} of \textit{individuals},
+	often referred to as \textit{chromosomes}.
+	Each individual represents a solution to the underlying
+	problem.
+	Together, the collection of individuals present at
+	a given iteration forms a \textit{population}.
+
+\item A \textit{fitness} function that determines
+	the quality of individuals. 
+	The fitness function is generally linked
+	to one or more underlying \textit{objectives}.
+
+\item A \textit{variation} mechanism that alters
+	the individuals in a population to create \textit{offspring}.
+	Variation often consists of a \textit{mutation} operator
+	that changes an individual's chromosome, and a \textit{crossover}
+	operator that combines individuals to create new offspring.
+	
+\item A \textit{selection} mechanism that pressures the is responsible
+	for pressuring the population toward better solutions. Selection
+	is generally driven by the fitness of individuals and strongly
+	influences the rate of convergence of the algorithm.
+\end{itemize}
+
+\begin{algorithm}
+	\SetKwData{Left}{left}
+	\SetKwData{This}{this}
+	\SetKwData{Up}{up}
+	\SetKwFunction{init}{InitializeAndEvaluatePopulation}
+	\SetKwFunction{terminate}{ShouldTermiante}
+	\SetKwFunction{offspring}{CreateAndEvaluateOffspring}
+	\SetKwFunction{select}{SelectIndividuals}
+	\SetKwInOut{Input}{Input}
+	\SetKwInOut{Output}{Output}
+	\Input{Population size $n$}
+	\Output{$N$ solutions}
+	\BlankLine
+	\DontPrintSemicolon
+	%\emph{special treatment of the first line}\;
+	
+	$t \leftarrow 1$\;
+	$P_1 \leftarrow $ \init{$n$}\;
+	\While{$\neg$ \terminate{$P_t$}}{
+		$O_t \leftarrow$ \offspring {$P_t, n$}\;
+		$P_{t+1} \leftarrow$ \select{$P_{t}, O_{t}, n$}\;
+		$t \leftarrow t + 1$\;
+	}
+	\Return $P_t$\;
+
+	\caption{Simple Genetic Algorithm}
+	\label{alg:sga}
+\end{algorithm}
+
+\newacronym{CFG}{CFG}{Context-Free Grammar}
+
+\section{Context-Free Grammars}
+
+Grammars are powerful tools used to study, specify,
+and understand languages. 
+A \Gls{CFG} leverages a recursive structure to
+specify a language's syntactic properties, without accounting for
+contextual semantics.
+\gls{CFG}s have become central to many fuzzers thanks to their ability 
+to effectively constrain generative processes to
+input that is syntactically meaningful for the target \gls{SUT}.
+For the remainder of this study, we use the terms terms \textit{grammar} 
+and \gls{CFG} interchangeably, and we adhere to the definition put forward
+by \citet{sipser1996introduction}.
+
+Formally, a \gls{CFG} is a 4-tuple~$G=(V, \Sigma, R, S)$,
+with (i)~$V$ a finite set of \textit{variables} or \textit{symbols},
+(ii)~$\Sigma$ a set of \textit{terminals} or \textit{terminal symbols} 
+such that $\Sigma \cap V = \emptyset$,
+(iii)~$R \subseteq V \times \Sigma \cup R$
+a set of \textit{rules} or \textit{productions} that define the ways in which a variable can be \textit{expanded}, and (iv)~$S \in V$ a \textit{start symbol} or \textit{start variable}.
+
