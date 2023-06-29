@@ -1,6 +1,6 @@
-\chapter{\label{cha:tool} Implementation Details}
-
 \newcommand{\kf}{\textsc{KotFuzz}}
+
+\chapter{\label{cha:tool} \kf}
 
 This chapter details the implementation of the conceptual methods
 laid out in \Cref{cha:algorithm} in a system
@@ -17,7 +17,7 @@ that (i) enable the generation of Kotlin code,
 (ii) allow the differential testing of specific compiler versions,
 and (iii) can perform analysis on the performance
 and behavior of its algorithms.
-The implementation spans around 9,000 lines of code
+The implementation spans around 10,000 lines of code
 across five programming languages and more than dozen libraries.
 In addition to providing a versatile toolkit, we aim for
 \kf~ to fulfill two other key qualities.
@@ -318,4 +318,302 @@ For this use case, the compiler service is a better fit.
 
 \subsubsection{Classification Service}
 
-\section{\label{sec:configuration}Configuring the Tool}
+\kf~ is intended to uncover defects in the Kotlin compiler.
+However, our empirical analyses and fuzzing campaigns revealed
+that the distribution of defects \kf~unocovers in a typical run
+is significantly skewed.
+In particular, we found that there exist certain kinds of files
+that trigger recurring problems in the compiler.
+Once \kf~ has uncovered a sufficient number of bugs
+of a certain type, it is preferable to avoid generating
+files that trigger the same defects in the future, because
+(i) these files reveal no new information about 
+defects in the compiler, and (ii) they consume computational resources
+during both search and analysis, that could be better
+used in the generation of new files.
+
+It is the function of the classification service to
+detect such occurrences during search.
+The simplest way to do so is to compile
+intermediate populations during search,
+cache the compiler output in a temporary file,
+and analyze the file to detect patterns linked to known defects.
+However, this method defeats the purpose of the classification
+service altogether, as it requires \textit{more} computational resources
+to be expended by compiling even more code.
+To circumvent this limitation, we developed implemented a \gls{ML}
+classification algorithm for the most common error that \kf~ generated code
+triggers: out of memory errors.
+\Cref{cha:results} provides deeper analysis into these errors.
+
+Similar its counterparts, we designed the classification service
+with modularity and versatility in mind.
+A REST API provides access to an endpoint that consumes a
+the text pretaining to an individual during search and returns
+a boolean value representing the model's prediction (whether the text
+would trigger an out of memory error in the compiler).
+Custom objects can be mounted to a dedicated directory in the running
+container to allow for further user customizaiton.
+By default, we provide two classifiers based on Decision Trees
+and \texttt{Adaboost} \cite{freund1997decision}, respectively.
+Both models operate on the embedding numerical representation
+of files and were trained on circa 8,000 data points of generated code.
+Empirical k-fold cross validation revealed an accuracy of over $0.99$ for both models.
+
+\section{\label{sec:configuration}Configuring the System}
+
+To navigate the full breadth of features proposed in \Cref{cha:algorithm},
+while simultaneously masking the complexity of their implementation,
+we implemented a comprehensive configuration system that allows
+users of \kf~ to seamlessly choose between compose the desired behavior
+of the tool from many individual components.
+
+The configuration system incorporates two modules.
+The first and simple of the two consists of command line arguments that
+users provide when executing the main fuzzer service.
+\Cref{tab:cmd_args} contains a description of all available command line arguments,
+which are divided between three broad categories.
+The first (lines 2-6 of the table) specify the resources
+required to configure the heuristic, context, and extended grammar components.
+The second category (lines 7-12) specify the seeds that each 
+random-driven process in the fuzzer should use.
+The final group of command line arguments
+dictate the time budget and output directory of the fuzzer,
+further allowing for the \gls{GA}s to take intermediate snapshots
+of their populations during runtime.
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{c|c|cc}
+        \toprule
+         Argument & Type & Effect & Required\\
+         \midrule
+         \texttt{configFile} & Path & Path to the configuraition file. & \ding{52}\\
+         \texttt{lexerFile} & Path &  Path to the \textsc{antlr4} \textit{lexer} grammar specification. & \ding{52} \\
+         \texttt{grammarFile} & Path & Path to the \textsc{antlr4} \textit{parser} grammar specificaiton. & \ding{52}\\
+         \texttt{compilerPath} & Path & Path to the compiler to be used during fuzzing. & \ding{56}\\
+         \texttt{classPath} & Path & Path to the directory containing context files. & \ding{52}\\
+         \midrule
+         \texttt{ctxSeed} & \multirow{5}{*}{Integer} & \multirow{5}{*}{Seed to use for stochastic-driven processes.} & \ding{52}\\
+         \texttt{searchSeedSeed} & & & \ding{52}\\
+         \texttt{selectionSeed} & & & \ding{52}\\
+         \texttt{recombinationSeed} & & & \ding{52}\\
+         \texttt{ctxSeed} & & & \ding{52}\\
+         \midrule
+         \texttt{time} & Integer$^{+}$ & Time budget (ms) to run the fuzzer for. & \ding{52}\\
+         \texttt{takeSnapshots} & Boolean & Whether the fuzzer should take intermediate snapshots. & \ding{52}\\
+         \texttt{snapshotInterval} & Integer$^{+}$ & Time (ms) between snapshot intervals. & \ding{56}\\
+         \texttt{output} & Path & Time budget (ms) to run the fuzzer for. & \ding{52}\\
+         \bottomrule
+         \end{tabular}
+    \caption{Overview of command line argument options.}
+    \label{tab:cmd_args}
+\end{table}
+
+This simple system suffices for specifying the runtime behavior
+of the system, however, its capabilities fall short
+of those required to fully customize the system.
+Providing fine-grained information pertaining to
+the many heuristic options available in \kf~ through
+the command line is both cumbersome and error prone.
+To mitigate this, we enable users to configure the syntactic,
+semantic, and heuristic attributes of \kf~ through
+a static configuration file, which they can link to main fuzzer
+service through a command line option.
+\Cref{fig:config} provides a truncated version of a configuraiton specification.
+The specification follows the popular \texttt{yaml} \footnote{https://yaml.org/}
+serializaiton language, which offers a clear and readable layout.
+
+\begin{figure}
+    \centering
+\begin{minted}
+[
+frame=leftline,
+framesep=2mm,
+baselinestretch=1,
+% bgcolor=gray,
+fontsize=\footnotesize,
+linenos
+]
+{yaml}
+heuristic:
+  type: proximity-ga
+  population-size: 10
+  new-blocks-generated: 2
+  distance-metric: euclidean
+  blocks-per-suite: 20
+  num-iters-per-target: 10
+  suite-mutation-probability: 0.1
+  selection:
+    individual: # Selection for GAs where individuals are blocks
+      mo-selection: domination-rank # For MO algorithms
+      so-selection : tournament     # For SO algorithms
+      tournament-size: 4
+      maximum-length: 500           # Additional selection filters
+    suite:      # Selection for GAs where individuals are suites
+      so-selection: tournament
+      tournament-size: 4
+  remote:
+    embedding-single: http://localhost:9090/embedding-single/
+    embedding-multi: http://localhost:9090/embedding-multiple/
+    targets: http://localhost:9091/centers/kmeans100/
+    num-targets: 100
+    oom:    # Out-of-memory detection model
+      enable: true
+      oom-single: http://localhost:9092/predict-single/
+      oom-multi: http://localhost:9092/predict-multiple/
+grammar:
+  simplicity-bias: 0.6 # Likelihood of sampling a simple expression
+  plus-node-dist:
+    type: uniform # Unifrom categorical distribution between 1 and 5
+    lower-bound: 1
+    upper-bound: 5
+  try-block-dist:
+    type: geometric # Unbounded geometric distribution
+    lower-bound: 0
+  catch-block-dist: # The number of catch blocks to generate
+    type: geometric
+    lower-bound: 0
+  catch-block-stmt-dist: # Number of statements within each block
+    type: geometric
+    lower-bound: 0
+  language-features:
+  functions:
+    enable: true
+  expressions:
+    simple-expr:
+      enable: true
+      weight: 1.0 # Relative weight to all other expressions
+    if-expr:
+      enable: true
+      weight: 19.0 # Relative weight to all other expressions
+\end{minted}
+    \caption{Sample configuration subset.}
+    \label{fig:config}
+\end{figure}
+
+The configuration itself is split between two large sections.
+The first (lines 1-26) relates to the algorithmic engine
+of the fuzzer service.
+In sections, users can define the class of search algorithm
+they prefer to use (line 2), as well as finer details regarding its
+variation and selection operators.
+Lines 3, 4, and 6 control the size of the population for \gls{GA}s,
+while lines 8-17 dictate the behavior of genetic operators.
+Here, users can select the selection operator they favor for both
+the \gls{SO} (tournament, truncation, proportionate) and
+\gls{MO} (domination rank, domination count).
+Further \gls{SO} selection mechanisms can be configured for the
+\texttt{WS} scalarization approach (lines 15-17).
+Moreover, this section covers the integration
+of remote services to the main fuzzer component.
+The \texttt{remote} section (lines 18-26) is where
+URLs to the endpoints for the targets, embedding, and classification
+services are specified.
+
+The second section of the configuration (lines 27-51) contains
+information regarding the probability distribution that governs the
+\gls{CFG} interpretation of the fuzzer.
+This is highly valuable for scenarios in which practitioners are interested
+in stressing a particular subcomponent of Kotlin.
+The first and most impactful parameter of this section
+is the \textit{simplicity bias} (line 28).
+The simplicity bias of the fuzzer is the probability
+with which a \textit{simple} expression is sampled over
+any alternative in the \gls{CFG}.
+Simple expressions are instances of callables (\Cref{sec:context}),
+and include function calls, constructor calls, and directly assignable values.
+The simplicity bias of a fuzzer run directly determines how
+complex and large generated blocks are, by allowing tuning
+the intricacy of generated expressions.
+
+Further options in the latter part of the configuration
+center on tuning the distributions of both
+syntactic (lines 29-32) and semantic (lines 33-41) constructs.
+Distributions can be either uniform or
+geometric, and allow the user to favor or limit the extent with which
+language features manifest.
+The level of detail is granular enough to allow users to independently
+control the number of occurrences of language features (like \texttt{catch} blocks
+in lines 36-38) as well as the number of statemts within these
+instances (lines 39-41).
+The same system applies to larger-scope language features, like
+entire expression categories (lines 42-51).
+Users can provide weights to expressions and statements,
+which determine their relative frequency within generated code,
+and even disable whole categories altogether.
+
+Parsing, and tuning the extensive options of
+the configuration system may prove challenging to users of \kf.
+To alleviate the issue of understanding the 100+ field configuration,
+we provide exhaustive documentation explaining all possible values
+for each category of settings, their effects on the system.
+Sensible defaults are also available in the source repository.
+Finally, the configuration component of the fuzzer service
+alerts the user at runtime whether fields of the
+configuration are missing or otherwise misconfigured.
+Expected values are also printed out in common cases of erronous specifications.
+
+\section{\label{sec:runtime}Running the System}
+
+The highly modular nature of \kf~ containerization an important factor when running the tool.
+A dedicated directory within the repository structure contains
+all image specifications in the \texttt{Dockerfile} format.
+A single setup script is available, that prepares all images locally in
+a dependency-senstive manner.
+Once built, users can first run the auxiliary services,
+before running the main fuzzer container with an appropriate configuration.
+
+\newacronym{IDE}{IDE}{Integrated Development Environment}
+
+However, this option might not suffice for users interested
+in extending or tracing the execution of the system.
+For this purpose, the fuzzer service can also be run locally
+in two ways.
+First, the \texttt{Gradle} build tool \footnote{https://gradle.org/}
+manages the dependencies of the system.
+We provide the local \texttt{Gradle} configuration
+with an additional \textit{task} called \texttt{uberJar},
+which compiles the entire fuzzer service, together with
+all of its dependencies, down to a single \texttt{jar} file.
+Users can experiment with this implementation of the system
+in isolation from the other containerized services.
+Finally, an additional entry point exists
+within the class structure, that allows users
+to run the application through their Java \gls{IDE} of choice,
+without providing additional command line arguments.
+Default options are instead tailored to the structure of the repository.
+
+Whichever method a user chooses (container or \texttt{jar}),
+the final running command is a simple listing of all command line arguments
+described in \Cref{tab:cmd_args} through the \texttt{java} command line utility.
+When running in a containerized environment, additional volume mounts
+specifying the output, resources, and configuration directories should be 
+made available.
+\Cref{fig:run_cmd} contains an example of running
+the container version of the fuzzer service, the entry point
+of which is \texttt{java}.
+To run the service locally, a user need only
+replace the first four lines of the command with \texttt{java},
+and adjust the resource paths accordingly.
+
+\begin{figure}
+    \centering
+    \begin{minted}{text}
+        docker run --name kotfuzz-runner -it --rm\
+        -v $(pwd)/output:/output\
+        -v $(pwd)/resources:/resources:ro\
+        -v $(pwd)/configs:/configs:ro kotfuzz-fuzzer\
+        -DlexerFile="/resources/antlr/KotlinLexer.g4"\
+        -DgrammarFile="/resources/antlr/KotlinParser.g4"\
+        -DcompilerPath="/resources/kotlinc"\
+        -DclassPath="/resources/kotlin/"\
+        -DctxSeed=0 -DsearchSeed=0 -DselectionSeed=0 -DmutationSeed=0\
+        -DrecombinationSeed=0 -Dtime=60000\
+        -DtakeSnapshots="false" -DsnapshotInterval=20000\
+        -Doutput="/output" -DconfigFile="/configs/rs/cfg-0.6.yaml"\
+        -jar fuzzer.jar
+    \end{minted}
+    \caption{Sample command to run the fuzzer.}
+    \label{fig:run_cmd}
+\end{figure}

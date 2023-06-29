@@ -4,7 +4,104 @@
 This chapter details the foundational techniques, abstractions,
 and trade-offs that our novel approach employs to generate syntactically
 valid and semantically meaningful Kotlin code.
+\section{\label{sec:approachoverview}Approach Overview}
 
+We design our approach along three main pillars, broadly depicted in \Cref{fig:approach}.
+The first two pillars tackle the fuzzer's internal connection to Kotlin
+through semantics and syntax.
+The third coalesces the interfaces provided by the first two
+into a powerful representation which allows the integration of complex
+heuristic approaches into the fuzzing process.
+
+\Cref{sec:context} addresses the first core component of the fuzzer,
+which  handles the semantics of Kotlin.
+This module contains representations for a wide range
+of Kotlin code constructs, a detailed type hierarchy, and
+adaptable constraints that aid with code generation at runtime.
+In addition, this \textit{context} component is equipped with
+an extraction procedure that allows users to customize
+the semantic environment in which the fuzzer operates.
+
+\Cref{sec:syntax} discusses the syntax handling module of the fuzzer.
+This component operates on a specification of the Kotlin \gls{CFG},
+which it transforms into a truncated version that supports
+additional operations that integrate with its context-handling
+counterpart.
+This increases the versatility and configurability of the fuzzer.
+
+Sections \ref{sec:repr} and \ref{sec:heuristics} outline the final pillar
+of our approach.
+The former establishes a hierarchical structure that aligns code
+within generated files with its local dependencies, enabling
+powerful mutation operators.
+The latter develops this structure into three classes of
+search algorithms.
+Finally, a fourth auxiliary configuration component
+augments the three main pillars and allows users
+to select from the many techniques established in this chapter.
+
+% Define block styles
+\tikzset{%
+  materia/.style={draw, fill=gray!20, text width=6.0em, text centered, minimum height=1.5em,drop shadow},
+  etape/.style={materia, text width=8em, minimum width=10em, minimum height=3em, rounded corners, drop shadow},
+  texto/.style={above, text width=6em, text centered},
+  linepart/.style={draw, thick, color=black!50, -LaTeX, dashed},
+  line/.style={draw, thick, color=black, -LaTeX},
+  ur/.style={draw, text centered, minimum height=0.01em},
+  back group/.style={fill=white,rounded corners, draw=black, dashed, inner xsep=15pt, inner ysep=10pt},
+}
+
+\newcommand{\etape}[2]{node (p#1) [etape] {#2}}
+
+\newcommand{\transreceptor}[3]{%
+  \path [linepart] (#1.east) -- node [above] {\scriptsize #2} (#3);}
+
+\begin{figure}
+    % \centering
+\begin{tikzpicture}
+
+  % Draw diagram elements
+  \path \etape{1}{Kotlin Files};
+  \path (p1.east)+(3.5,0.0) \etape{2}{Grammar Spec};
+  \path (p2.east)+(3.5,0.0) \etape{3}{Config Spec};
+  
+  \path (p1.south)+(0.0,-1.5) \etape{4}{Context};
+  \path (p2.south)+(0.0,-1.5) \etape{5}{Extended \gls{CFG}};
+  \path (p3.south)+(0.0,-1.5) \etape{6}{Configuration};
+
+  \path (p5.south)+(0.0,-1.5) \etape{7}{Search Algorithm};
+  \path (p7.south)+(0.0,-1.5) \etape{8}{Generated Code};
+  \path (p8.east)+(3.5,0.0) \etape{9}{\texttt{K1} Compiler};
+  \path (p8.west)+(-3.5,0.0) \etape{10}{\texttt{K2} Compiler};
+
+  \path (p1.north)+(0.0,0.65) node (p11) {\Cref{sec:context}};
+  \path (p2.north)+(0.0,0.65) node (p11) {\Cref{sec:syntax}};
+  \path (p3.north)+(0.0,0.65) node (p11) {\Cref{sec:configuration}};
+  % Draw arrows between elements
+  \path [line] (p1.south) -- node [above] {} (p4);
+  \path [line] (p3.south) -- node [above] {} (p6);
+  \path [line] (p2.south) -- node [above] {} (p5);
+  \path [line] (p5.south) -- node [above] {} (p7);
+  \path [line] (p4.south) -- node [left] {} (p7);
+  \path [line] (p6.south) -- node [right] {} (p7);
+  \path [line] (p7.south) -- node [above] {} (p8);
+  \path [line] (p9.west) -- node [left] {} (p8);
+  \path [line] (p10.east) -- node [right] {} (p8);
+
+  \path (p7.east)+(+3.0,0) node (ur1)[ur] {};
+  \transreceptor{p7}{Sections \ref{sec:repr}, \ref{sec:heuristics}}{ur1};
+   
+  \begin{scope}[on background layer]
+    \node (bk1) [back group] [fit=(p1) (p4)] {};
+    \node (bk2) [back group] [fit=(p2) (p5)] {};
+    \node (bk3) [back group] [fit=(p3) (p6)] {};\
+    \node (bk4) [back group] [fit=(p8) (p9) (p10)] {};
+  \end{scope}
+\end{tikzpicture}
+
+    \caption{Conceptual layout of the approach.}
+    \label{fig:approach}
+\end{figure}
 \section{\label{sec:context}Semantic Interface}
 
 Kotlin is a rich programming language, that conjoins various
@@ -57,7 +154,7 @@ the inheritance of a symbolic type.
 		\node[minimum size=30pt] (D) at (5,4) {\texttt{Any}};
     		\node[minimum size=30pt] (A) at (0,4) {\texttt{Number}};
     		\node[minimum size=30pt] (B) at (5,1) {\tiny\texttt{Comparable$<$E$>$}};
-    		\node[minimum size=30pt] (C) at (0,1) {\tiny\texttt{Double}};
+    		\node[minimum size=30pt] (C) at (0,1) {\texttt{Double}};
     		\node[minimum size=30pt] (E) at (10,4) {\scriptsize\texttt{Iterable$<$E$>$}};
     		\node[minimum size=30pt] (F) at (10,1) {\tiny\texttt{Collection$<$E$>$}};
 	\end{scope}
@@ -76,7 +173,6 @@ the inheritance of a symbolic type.
     \caption{A sample of the type hierarchy representation using standard Kotlin types.}
     \label{fig:type-hierarchy}
 \end{figure}
-
 
 \Cref{fig:type-hierarchy} depicts the \Gls{DAG} representation
 a small subset of built-in and standard Kotlin types.
@@ -532,9 +628,9 @@ and include functions, methods, and classes.
 \begin{figure}[htp]
 \centering
 \begin{tikzpicture}[scale=0.55]
-        \filldraw[very thick,white,fill=gray!70] (0,0) -- (-7.5,-9) -- (7.5,-9);
-        \filldraw[very thick,white,fill=gray!85] (0,0) -- (-5,-6) -- (5,-6);
-        \filldraw[very thick,white,fill=gray] (0,0) -- (-2.5,-3) -- (2.5,-3);
+        \filldraw[very thick,white,fill=gray] (0,0) -- (-7.5,-9) -- (7.5,-9);
+        \filldraw[very thick,white,fill=gray!60] (0,0) -- (-5,-6) -- (5,-6);
+        \filldraw[very thick,white,fill=gray!30] (0,0) -- (-2.5,-3) -- (2.5,-3);
         \node at (0,-2) {\bfseries\sffamily\scshape\Large Block};
         \node at (0,-4.5) {\bfseries\sffamily\scshape\Large Snippet};
         \node at (0,-7.5) {\bfseries\sffamily\scshape\Large Fragment};
@@ -686,6 +782,9 @@ dependencies.
 
 \Cref{fig:traversals} depicts several sample traversals of a
 snippet dependency structure similar to that introduced in \Cref{fig:blocks}.
+Nodes with thick borders are affected by the traversal, while thinly bordered ones are not.
+Black depicts that the node is the starting point of the traversal,
+while blue and red denote nodes selected during up- and downstream traversals, respectively.
 Subfigure (a) gives the standalone topology of the block, and selects
 snippet \texttt{y} as the root of the traversal.
 An upstream traversal rooted in \texttt{y} would select \texttt{b} and \texttt{z},
@@ -701,7 +800,7 @@ Subfigure (d) illustrates three such traversals:
 starting at \texttt{a}, \texttt{b} is selected during an upstream traversal.
 Next, \texttt{y} and \texttt{x} from the downstream traversal rooted at \texttt{b}.
 Lastly, an upstream traversal rooted at either \texttt{x} or \texttt{y} yields \texttt{z}.
-The additional benefit of such traversals is that they preserve
+The additional benefit of traversals is that they preserve
 the ordering of nodes in graph, which graph walking algorithms may fail to do.
 
 \begin{figure}[t!]
@@ -719,7 +818,7 @@ the ordering of nodes in graph, which graph walking algorithms may fail to do.
 \draw[->] (5) -- (4);
 \end{tikzpicture}}
 \hfill
-\subfigure[Upstream traversal from \texttt{y}.]{
+\subfigure[Upstream traversal from node \texttt{y}.]{
 \begin{tikzpicture}[node distance={10mm}, thick, main/.style = {draw, circle}] 
 \node[main] (1) {$x$}; 
 \node[main,line width=0.75mm] (2) [right of=1] {$y$}; 
@@ -733,7 +832,7 @@ the ordering of nodes in graph, which graph walking algorithms may fail to do.
 \end{tikzpicture}
 }
 \hfill
-\subfigure[Downstream traversal from \texttt{y}.]{
+\subfigure[Successive downstream traversal from node \texttt{y}.]{
 \begin{tikzpicture}[node distance={10mm}, thick, main/.style = {draw, circle}] 
 \node[main,draw=red!80,line width=0.75mm] (1) {$x$}; 
 \node[main,line width=0.75mm] (2) [right of=1] {$y$}; 
@@ -760,7 +859,7 @@ the ordering of nodes in graph, which graph walking algorithms may fail to do.
 \draw[->] (5) -- (4);
 \end{tikzpicture}
 }
-\caption{Sample upstream and downstream traversals of snippet dependencies. Nodes with thick borders are affected by the traversal, while thinly bordered ones are not. Black depicts that the node is the starting point of the traversal, while blue and red denote nodes selected during up- and downstream traversals, respectively.}
+\caption{Sample upstream and downstream traversals of snippet dependencies. }
 \label{fig:traversals}
 \end{figure}
 
@@ -816,9 +915,10 @@ to guide a generative process underlying fuzzing.
 This section explores four meta-heuristic guiding oracles shaped into
 several concrete algorithm variations and their application
 in the context of compiler fuzzing.
-Subsections \ref{subsec:random-sampling}, \ref{subsec:diversity-ga}, and
-\ref{subsec:proximity-ga} elaborate three compiler-free heuristics, while \ref{subsec:compiler-ga} describes the integration of the compiler within the established heuristics.
-
+Subsection \ref{subsec:random-sampling} establishes a standard baseline algorithm,
+while \Cref{subsec:diversity-ga}, and \ref{subsec:proximity-ga}
+elaborate on two more complex heursitic approaches,
+centering on syntax and semantics, respectively.
 
 \subsection{\label{subsec:random-sampling} Random Sampling}
 

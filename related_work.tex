@@ -43,9 +43,12 @@ language grammar to generate novel test cases.
 Grammar-aided approaches heuristically exploit a given
 grammar, which is often enriched with semantically
 significant context. 
-Finally, fuzzers may not directly rely on a grammar,
+Fuzzers may not directly rely on a grammar,
 and instead define sound heuristic that respect
 a given linguistic syntax.
+Finally, we distinguish a third, separate category of fuzzers
+that fundamentally rely on machine learning techniques to generate input.
+Since these fuzzers do not fit in with the standard taxonomy, we address them separately in
 
 
 \newacronym{UB}{UB} {Undefined Behavior}
@@ -233,6 +236,58 @@ Additional expressions obtained either from the standard library
 or primitive types are additionally employed to populate
 remaining unfilled placeholders.
 
+\subsection{\label{subsec:ml-fuzzers}Machine Learning-Based Fuzzers}
+
+\newacronym{LSTM}{LSTM}{Long Short-Term Memory}
+\newacronym{RNN}{RNN}{Recurrent Neural Network}
+\newacronym{NAM}{NAM}{Neural Attribute Machines}
+
+\citet{amodio2017neural} develop an approach called \gls{NAM},
+that utilizes a \gls{LSTM} \cite{hochreiter1997long}
+neural network to embed multifaceted constraints
+and structural context into neural program generation.
+Their method extends the \textit{attribute grammar}
+formalism by leveraging an \gls{LSTM} that is capable
+of generating \gls{AST} nodes of test programs.
+The \gls{NAM} architecture exploits a tri-level
+loss function that seeks to minimize 
+(i) the model's divergence from the training set distribution,
+(ii) the model's likelihood of violating semantic constraints, and
+(iii) the model's likelihood of generating structurally valid, but nuanced incorrect code.
+Training occurs on the level of \gls{AST} nodes,
+additionally equipped with surrounding context and encoded
+by the \gls{NAM}'s \textit{logical unit}.
+Experiments show that structure emerges from the training procedure,
+but the likelihood of breaking common language ordering and type-safety
+constraints remains meaningful.
+
+\citet{cummins2018compiler} build a test program-based generative fuzzer
+that relies on a neural network for code generation.
+The system depends on a corpus of code repositories
+that serve as training data for the neural network.
+At the core of the system resides a \gls{LSTM}
+that models the distribution of vocabulary tokens within the input corpus.
+To generate programs, the \gls{LSTM} is sampled to produce
+novel vocabulary words in a token-by-token fashion,
+which are first decoded before being packaged together into viable test programs.
+The authors' empirical analysis shows that despite having no direct
+model for the language structure, the tool, called \textsc{DeepSmith},
+is able to generate highly structured code and uncover dozens of bug in the
+\textsc{OpenCL} system.
+
+We also note the existence of many statistics- and machine learning-
+driven approaches for tangential tasks, such as in the fields of
+program synthesis \cite{gulwani2017program} and
+program completion \cite{raychev2014code}.
+These tasks share similarities with the challenges of this
+study, namely the generation of valid and contextually-aware code.
+Though extendable to the field of compiler testing,
+these methods additionally account for \textit{user intent}
+(i.e., the goal of the program a user is attempting to synthesize).
+Compiler fuzzers broadly disregard this aspect, as their goals differs from 
+the former categories.
+For this reason, we do not go into further detail on such approaches.
+
 \section{\label{sec:specification_fuzzing}Specification Fuzzing}
 
 \citet{steinhofel2022input} propose the Input Specification Language (\textsc{ISLa}),
@@ -272,7 +327,7 @@ each \textit{k-path} in the grammar graph is present in the underlying
 set of derivation trees.
 The authors derive an enumeration-based \textit{k-path} algorithm
 stochastically iterates through all \textit{k-paths} up to a user-defined
-depth and instantiating encompassing derivation trees.
+depth and instantiating derivation trees.
 
 \citet{kreutzer2020language} introduce the language specification language
 (\textsc{LaLa}), a framework for semantically enriching the syntactic
