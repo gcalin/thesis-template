@@ -2,19 +2,20 @@
 \chapter{\label{cha:intro}Introduction}
 
 Compilers are ubiquitous and pivotal components
-at the core of innumerable software systemsand programming language ecosystems.
-They translate the high-level and human-readable source code
+at the core of innumerable software and programming language ecosystems.
+They translate the high-level, human-readable source code
 of computer programs into target-specific instructions that machines
 can parse and execute.
 As a consequence, the ramifications that arise from flawed
 compiler implementations can be both far-reaching and severe.
-The outstanding complexity and feature richness of compilers has created
+The outstanding complexity and feature richness of modern compilers has created
 several formidable challenges, the scope of which is perhaps best exemplified
 by \citet{hoare2003verifying}
 declaring the task of building a provably correct compiler to be a 
 \textit{Grand Challenge} in computing research.
-Researchers and practitioners have invested tremendous amounts of resources
-into compiler research in recent decades, attempting to improve
+In recent decades, researchers and practitioners
+have invested tremendous resources
+into compiler research, attempting to improve their
 performance, quality, and reliability. 
 Such efforts are especially beneficial for newer software systems,
 that require robust compilation pipelines to establish themselves
@@ -25,9 +26,9 @@ as worthy alternatives to mature standards.
 
 Because of their cornerstone role in many critical applications,
 compilers are often subject to thorough quality assurance processes.
-In practice, the compiler teams often rely on testing as a means
+In practice, compiler developers often rely on testing as a means
 of assessing and improving the correctness of compilers.
-Empirical evidence effectiveness the benefits of such approaches,
+Empirical evidence supports the benefits of such approaches,
 with \citet{sun2016toward} and \citet{holler2012fuzzing} highlighting
 the existence of bugs in widely used C compilers and JavaScript engines, respectively. 
 These findings stand out because of the maturity of the
@@ -36,7 +37,7 @@ the necessity of effective testing methods.
 
 One approach to testing compilers is to assemble manually-written test suites.
 This strategy has several advantages, including the possibility to individually
-target specific components of the compiler and the developer's ability to
+target specific components of the compiler and leveraging developers' capacity to
 reason about the tests' semantics and expected outputs.
 However, the labor-intensive nature of this process and 
 the imposing complexity of compiler code bases have
@@ -46,9 +47,9 @@ Though compelling and time-effective, automated test case
 generation strategies concurrently give rise to an arduous set of challenges.
 The infinite number of correct possible programs,
 the syntactic dependencies between code snippets,
-the broad range of compiler features,
+% the broad range of compiler features,
 and the many semantic nuances programming languages exhibit all constitute
-obstacles that effective fuzzing algorithms must address.
+obstacles that effective test generation tools must address.
 
 Fuzzing, or random testing, lends itself naturally to this task thanks to its
 ability to generate code snippets that trigger diverse behavior within the compiler.
@@ -68,15 +69,15 @@ ecosystems mature.
 
 \section{The Kotlin Programming Language}
 
-Kotlin \cite{kotlinlang} is a relatively new programming language whose development
+Kotlin \footnote{https://kotlinlang.org/} is a relatively new programming language whose development
 initiative is led by JetBrains.
 Initially designed as a Java alternative, the Kotlin
 ecosystem has steadily grown and currently envelops
-a broad range of use-cases, including server-side development,
-web front-end interfaces, and mobile applications. 
+a broad range of environments, including server-side development,
+web frontend interfaces, and mobile applications. 
 Kotlin showcases compelling features, including expressiveness,
-safety, and interoperability, which have played a key role in Google embracing
-a "Kotlin-first" approach in its popular Android mobile operating system \cite{kotlinfirst}.
+null safety, and Java interoperability, which played a key role in Google embracing
+a "Kotlin-first" approach in its Android mobile operating system \cite{kotlinfirst}.
 
 The number of research initiatives investigating Kotlin's impact 
 in the software development process has risen in tandem with its adoption.
@@ -106,10 +107,10 @@ provide seeds for an enumeration-based fuzzer aimed at detecting compilation
 errors between different compiler implementations. 
 Currently, no tool that is capable of generating entirely novel, semantically 
 meaningful, and diverse test programs for the Kotlin compiler exists.
-Creating such an algorithm would not only aid the quality assurance process
-of the Kotlin compiler, but also provide valuable insight relating to
-which language features require additional work and which
-fuzzing strategies are best suited for revealing compiler bugs.
+Creating such an tool would not only aid the quality assurance process
+of the Kotlin compiler, but also provide valuable insight 
+into the relation between language features and compiler defects.
+% fuzzing strategies are best suited for revealing compiler bugs.
 
 \section{\label{sec:aim}Research Aim and Scope}
 
@@ -120,13 +121,15 @@ key limitations.
 First, this thesis only concerns itself with empirical analyses regarding
 the Kotlin compiler. 
 Though the prototype implementation may well be 
-extended to target other systems, restrain the
+extended to target other systems, we restrain the
 evaluation to Kotlin and its current compiler versions ensure feasibility.
 
 Second, this study investigates the ability of the proposed fuzzing
 techniques to find bugs in the targeted compiler, and does not emphasize
 the practical or commercial implications of the uncovered bugs.
-Further, research concerning other widely studied defect-centric 
+We provide a qualitative analysis of the uncovered defects, but do
+not further investigate the ramifications of their existence.
+Moreover, research concerning other widely studied defect-centric 
 practices such as bug localization, program minimization, and bug deduplication
 are outside the scope of this study.
 Within these constraints, we seek to achieve the following research aim:
@@ -149,14 +152,12 @@ research questions.
 A vital point to consider when designing a fuzzing algorithm is
 its potential to adapt to the goals of its users. \citet{amalfitano2015exploiting}
 show that random testing approaches eventually reach a
-saturation point, where novel input is exceedingly unlikely to trigger
-detecting new faults. 
+saturation point, where novel input is exceedingly unlikely to trigger new faults. 
 To combat this, practitioners can either design new tools, adapt existing
 ones, or intertwine approaches.
 While flexible design can help mitigate this shortcoming, studying the 
 impact of cornerstone hyperparameters and heuristic choices
-is crucial for understanding the scope of a fuzzer and the
-inherent properties of its ouput.
+is crucial for understanding the scope of a fuzzer and its behavior.
 To this end, we formulate the following research question:
 
 \begin{quote}
@@ -174,9 +175,8 @@ within an evolutionary framework:
 
 \begin{quote}
 \centering 
-\emph{\textbf{RQ2:} How effective is meta-heuristic
-guided test-program based evolutionary fuzzing
-at uncovering bugs in the Kotlin compiler?}
+\emph{\textbf{RQ2:} How do the proposed generative heuristics
+compare in terms of uncovering bugs in the Kotlin compiler?}
 \end{quote}
 
 % The conjoined analysis of the research questions unlocks both
@@ -193,9 +193,9 @@ The study makes the four following contributions:
 
 \begin{enumerate}
 	\item Three novel formulations of grammar-aided test program-based compiler fuzzing,
-including a random-driven random sampling approach,
+including a random sampling approach
 and two evolutionary algorithms revolving
-around diversity- and proximity-driven criteria
+around diversity- and proximity-driven criteria.
 	\item A modular, configurable, and extendable framework for
 end-to-end automated fuzzing of the Kotlin compiler,
 implementing the three proposed approaches.
@@ -205,14 +205,14 @@ and heuristic-driven behavior of the three novel fuzzing algorithms.
 for validating, verifying, and extending the current study.
 \end{enumerate}
 
-From a theoretical perspective, we expect our contributions
-to deepen the insight into the applicability and effectiveness
-of test program-based fuzzing and its adjacent heuristics as a 
-means of compiler testing. 
+From a theoretical perspective, we investigate the applicability
+and adaptation of evolutionary fuzzing techniques to the task of compiler testing. 
 The significance of this knowledge is tied to the continued
 interest in establishing reliable quality assurance measures for compilers.
-On a practical level, we expect the resulting
-prototype implementation to become a useful tool for improving the 
+On a practical level, we provide
+prototype implementation that supports the proposed algorithms
+and includes additional infrastructure surrounding the core fuzzing process.
+We aim for this tool to become a useful instrument for improving the 
 reliability and quality of the Kotlin compiler.
 Compiler engineers can leverage such a tool as an additional
 step in a continuous integration pipeline, or choose to employ it
@@ -220,7 +220,7 @@ when developing novel features in future versions of the language.
 
 \section{Overview of the Study}
 
-This thesis consists of eight additional chapters situated in three main parts.
+This thesis consists of eight additional chapters split between in three main parts.
 Part I consists of Chapters \ref{cha:background} and \ref{cha:related}, and
 provides an overview of the relevant body of knowledge and literature.
 Chapter \ref{cha:background} introduces the theoretical background
@@ -228,7 +228,7 @@ that constitutes the foundation of this study.
 Chapter \ref{cha:related} discusses related work and positions this
 thesis within the current research landscape.
 
-Part II encompasses Chapters \ref{cha:algorithm}, \ref{cha:tool}, \ref{cha:study}, and \ref{cha:results}
+Part II encompasses Chapters \ref{cha:algorithm}, through \ref{cha:results}
 and details the main contributions of this thesis. 
 Chapter \ref{cha:algorithm} describes the conceptual outline of
 the fuzzing procedure and the rationale behind its
@@ -242,9 +242,7 @@ and ties them to the main research questions.
 
 Part III includes Chapters \ref{cha:discussion} and \ref{cha:conc} 
 and reflects upon the outcomes of this study.
-Chapter \ref{cha:discussion} fixates on discussing the main 
-findings of this research within a broader landscape
-and considers their practical ramifications with respect to the Kotlin compiler.
-Finally, Chapter \ref{cha:conc} reflects upon this
-thesis and makes concluding recommendations for future research.
+Chapter \ref{cha:discussion} discusses the main 
+findings of this research, its limitations, and makes additional recommendations for future research.
+Finally, Chapter \ref{cha:conc} concludes the thesis.
 

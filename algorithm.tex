@@ -24,10 +24,10 @@ the semantic environment in which the fuzzer operates.
 
 \Cref{sec:syntax} discusses the syntax handling module of the fuzzer.
 This component operates on a specification of the Kotlin \gls{CFG},
-which it transforms into a truncated version that supports
-additional operations that integrate with its context-handling
-counterpart.
-This increases the versatility and configurability of the fuzzer.
+which it transforms into a truncated version.
+The transformation additionally equips the grammar with
+operations that integrate with its context-handling counterpart,
+in turn enhancing versatility and configurability of the fuzzer.
 
 Sections \ref{sec:repr} and \ref{sec:heuristics} outline the final pillar
 of our approach.
@@ -66,7 +66,7 @@ to select from the many techniques established in this chapter.
   \path (p2.east)+(3.5,0.0) \etape{3}{Config Spec};
   
   \path (p1.south)+(0.0,-1.5) \etape{4}{Context};
-  \path (p2.south)+(0.0,-1.5) \etape{5}{Extended \gls{CFG}};
+  \path (p2.south)+(0.0,-1.5) \etape{5}{Extended CFG};
   \path (p3.south)+(0.0,-1.5) \etape{6}{Configuration};
 
   \path (p5.south)+(0.0,-1.5) \etape{7}{Search Algorithm};
@@ -111,7 +111,7 @@ These abstractions collectively govern the semantics
 of the language, and implicitly determine the validity of programs.
 We jointly represent the core concepts that compose the Kotlin
 semantics, as well as the constraints that underlie their behavior,
-under an overarching concept called the fuzzer's \textit{context}.
+under an construct concept called the fuzzer's \textit{context}.
 
 The context contains both adaptive, program-specific details (such as scopes and
 visible identifiers), and universally applicable statues (such as type hierarchies).
@@ -120,7 +120,13 @@ process, similarly to \textsc{YARPGen} \cite{manes2019art}.
 However, unlike \textsc{YARPGen}, we endow our representation of the context
 with an extraction feature that allows the parsing of arbitrary
 Kotlin code to serve as the basis of further generation. 
-The remainder of this section describes TODO key features of the context.
+The remainder of this section describes three key features of the context.
+\Cref{subsec:type-hierarchy} first addresses the type hierarchy
+representation.
+\Cref{subsec:callables} describes the internal representation
+of language structures.
+Finally, \Cref{subsec:context-extraction} lays out
+the automated context extraction process.
 
 \newacronym{DAG}{DAG} {Directed Acyclic Graph}
 
@@ -133,7 +139,7 @@ Formally, a \Gls{DAG} $G$ is a tuple $\langle V, E \rangle$ composed
 of a set of vertices $V$ and a function $E : (V \times V) \to L^{+}$ that
 each link pairs of vertices in $V$ through a composite transition from a domain $L$.
 
-The set $V$ comprises all the accessible classifier types
+The set $V$ comprises all the accessible \textit{classifier} (classes and interfaces) types
 (i.e., (abstract) classes, interfaces) in the environment.
 The function $E$ maps each pair of vertices $\langle u, v \rangle$ with $u, v \in V$
 to a label $l \in L = \{ \emptyset, >, \epsilon \} \cup V$, where the label signifies
@@ -175,10 +181,11 @@ the inheritance of a symbolic type.
 \end{figure}
 
 \Cref{fig:type-hierarchy} depicts the \Gls{DAG} representation
-a small subset of built-in and standard Kotlin types.
+a small subset of built-in and standard Kotlin types,
+with $\emptyset$ transitions left out.
 Within this hierarchy, the \texttt{Number}, \texttt{Comparable$<$E$>$}, 
 and \texttt{Iterable$<$E$>$} types all directly inherit from the \texttt{Any} node, 
-the root of the type hierarchy.
+which is the root of the type hierarchy.
 The \texttt{Number} and \texttt{Comparable$<$E$>$} have a common immediate descendant in the 
 \texttt{Double} type, though their transitions differ.
 The transition between \texttt{Comparable$<$E$>$} and \texttt{Double} itself
@@ -212,7 +219,8 @@ when fuzzing the Kotlin standard library.
 \subsection{\label{subsec:callables}Callable Representation}
 In addition to a type hierarchy, the fuzzer uses knowledge to which \textit{callables}
 it can act upon.
-We use the term callable in a similar fashion to \citet{stepanov2021type}, with this term encompassing
+We use the term callable in a similar fashion to \citet{stepanov2021type}.
+The collection of callables in the context encompasses
 the set of functions, methods, constructors, variables, constants, and predefined primitive values
 available to the fuzzer.
 We model each callable as a 5-tuple $\langle N, O, P, I, R \rangle$ that builds on top of the
@@ -393,10 +401,10 @@ Because of this, a simple topological sorting algorithm suffices to construct th
 An initial \texttt{Any} node serves as the root of the graph
 and represents the parent for all classifiers
 that do not explicitly inherit from other constructs.
+This design choice simplifies the application of further graph traversal algorithms.
 
 \newacronym{OO}{OO}{Object-Oriented}
 
-This design choice simplifies the application of further graph traversal algorithms.
 The topological sorting then proceeds by filtering available parsed classifiers on three conditions: (i) that the direct parents of the classifier have been added to the hierarchy, (ii) that the concrete parameterized types of the classifier have been added to the hierarchy, and (iii) that the owner
 type of the classifier has been added to the hierarchy (if nested types are encountered).
 Classifiers that meet these requirements can be added in an arbitrary order.
@@ -419,7 +427,7 @@ common queries during runtime.
 
 \section{\label{sec:syntax}Syntactic Interface}
 
-Effectively leveraging the syntax of a programming language is of paramount importance
+Effectively leveraging the syntax of a programming language is a prerequesite for
 ensuring the correctness of automatically generated code.
 In this work, we seek to exploit the usage of the Kotlin \gls{CFG} as both a means of increasing
 the flexibility of the fuzzer and a guide that enforces the validity of generated code.
@@ -431,7 +439,7 @@ suffers from several limitations which
 curtail the grammar's standalone potential within the fuzzer.
 The remainder of this section describes the
 implementation of the grammatical representation
-within the fuzzer, its integration with the Context,
+within the fuzzer, its integration with the context,
 and the reasons behind the enhancements
 we enriched the grammar with.
 
@@ -479,7 +487,7 @@ which aims at reducing the complexity of generating valid samples.
 The atomic node transformation can either leave a node unchanged or \textit{truncate} its
 productions.
 Simple nodes such as ones solely containing unicode characters are preserved, while
-nodes which introduces substantial contextual semantics are subject to change.
+nodes which introduce substantial contextual semantics are subject to change.
 This reduces the problem of obtaining valid samples from the grammar to implementing
 appropriate methods of leveraging the \texttt{sample} property of each affected node.
 
@@ -540,7 +548,7 @@ In this case, the algorithm transforms \textsc{as} node into its extended versio
 which encodes relevant constraints within its \texttt{sample} property.
 Transformed nodes may additionally transfer such constraints between them when sampled:
 for instance, the assignment node may propagate its type-consistent constraint to a generic
-\textsc{expr} node that generates consistent and valid Kotlin expressions.
+\textsc{expr} node that generates constraint-aligned and valid Kotlin expressions.
 
 This extended \gls{CFG} technique provides several advantages.
 First, it forms a framework that solves the problem of semantically constrained grammar sampling.
@@ -549,30 +557,34 @@ one can effectively evade the problems that the context-invariant grammar raises
 Second, it is an effective trade-off between implementation difficulty and core grammar usage. 
 This technique preserves the key properties and relations in the Kotlin grammar, while
 not necessitating that every production is individually catered to. 
-For instance, transformed nodes may simply inherit (part of) their structure from the
-\textsc{antlr4} definition.
+For instance, transformed nodes may simply inherit part of
+their structure or their entire specification from the \textsc{antlr4} definition.
 
 Finally, the extended \gls{CFG} framework serves as a versatile foundation for fuzzing
 algorithms, by allowing higher-level routines to target specific symbols in the grammar.
-This property may prove valuable as practitioners could use heuristics to stress 
-certain language features, compiler modules, or code bases in a more reliable
-manner than depending on sheer randomness.
+This property favors configurability and allows for extensive adaptations
+of the core grammar.
+Practitioners may additionally choose to sample only select nodes in the grammar,
+thus effectively targeting desired subsets of the Kotlin language.
+% This property may prove valuable as practitioners could use heuristics to stress 
+% certain language features, compiler modules, or code bases in a more reliable
+% manner than depending on sheer randomness.
 
 This approach stands out from the current body of literature through 
 the balance it strikes between the level of user "intervention" in re-writing grammar
 rules and the utilization of pre-written grammar specifications.
-In isolation, neither side of this this trade-off is novel.
+In isolation, neither side of this trade-off is novel.
 \textsc{Csmith} \cite{yang2011finding} has demonstrated the effectiveness
 of manually constructing a sampling structure without
 direct usage of a grammar over a decade ago, while approaches like
 \textsc{ISLa} \cite{steinhofel2022input} show that
-constrain-annotated grammars can effectively encode
+constraint-annotated grammars can effectively encode
 common and meaningful semantic constraints.
 However, our integration of contextual sampling within an extended
 grammar representation enables algorithms built on top of it
-to individually tune the semantic constraints of each individual
-symbol, while always having to option to "fall back" on the 
-pure grammar representation in cases where appropriate.
+to individually tune the semantic constraints of each
+symbol, while always retaining to option to "fall back" on the 
+pure grammar representation where appropriate, preserving the \textit{shape} of the grammar.
 \subsection{\label{subsec:context-efcg} Connecting Context and Grammar}
 
 
@@ -587,7 +599,7 @@ whether the current context should be transmitted as-is, cloned, or mutated.
 Simple nodes like expressions utilize an unchanged context, while more complex
 constructs, like variable declarations may insert additional identifiers.
 Encompassing constructs like class and function definitions are scope sensitive,
-which requires careful handling local and nested operations.
+which requires careful handling of local and nested operations.
 To address this, each such node creates a local copy of the context, to
 which it might add isolated information, before persisting globally accessible data
 (i.e., function names, or new types) to the root context.
@@ -595,7 +607,7 @@ In essence, this integration allows for autonomous context-sensitive random samp
 extended grammar: the extended nodes each query the context
 in such a way that consistent constructs emerge.
 The context, in turn, provides an interface that provides several guarantees with respect 
-to future future parameterized queries.
+to future parameterized queries.
 
 \section{\label{sec:repr} Code Representation}
 
@@ -615,8 +627,8 @@ based on scope and isolated validity.
 \Cref{fig:code-hierarchy} illustrates this hierarchy.
 \textit{Fragments} lie at the base of the pyramid and compose low-level 
 language constructs, such as expressions and statements.
-These pieces of code are of low independent value as they do not
-capture any logic structure and rely heavily on surrounding semantic context.
+These pieces of code do not capture any logic
+structure and rely heavily on surrounding semantic context.
 A step above are the code \textit{snippets}: individually encapsulated
 pieces of code comprised of fragments.
 Snippets emerge when changes in scope are significant enough to
@@ -656,13 +668,14 @@ context-independent.
 The interdependency of snippets materializes as a consequence of
 the sequential nature of node sampling: as nodes recursively unfold
 their \texttt{sample} property, prior changes to the context
-trigger subsequent effects (i.e., previously generated 
+trigger subsequent consequences (i.e., previously generated 
 functions may appear in later expressions).
 To overcome this obstacle several snippets can assemble into \textit{blocks},
 the highest construct of the pyramid.
 This snippet \textit{aggregation} procedure works on the basis of a dependency matching
 algorithm that recursively traverses snippets within a Kotlin file and retrieves
 external snippets that their fragments depend on.
+
 The pyramidal abstraction construct shares conceptual similarities with both
 the works of \citet{holler2012fuzzing} and \citet{han2019codealchemist}.
 However, there are fundamental differences between our method and past work.
@@ -692,6 +705,8 @@ but also because it ensures that compiler resources do not go to waste
 in analyzing incomplete files.
 The \textit{block} abstraction is the cornerstone of the 
 \gls{GA} framework, shaping all higher-level operators and constructs.
+In the remainder of this section, we analyze the foundational elements of
+the evolutionary fuzzing toolkit.
 
 \begin{figure}
 \begin{lstlisting}[language=Kotlin]
@@ -736,7 +751,7 @@ lines of code 5-7 require the presence of \texttt{x} for completeness.
 established chromosome model has to do with the ordering of
 snippets inside $\mathcal{L}$.
 Though representationally irrelevant, the order of snippets within
-the list becomes relevant when the chromosome instantiates
+the list becomes crucial when the chromosome instantiates
 a concrete piece of code.
 Snippets in Kotlin can be order-sensitive, meaning that to
 instantiate valid code, the list of snippets within the chromosome
@@ -745,7 +760,7 @@ emerges.
 Using again the example in \Cref{fig:blocks}, this means
 that within the chromosome representing the entire piece of code,
 the snippet \texttt{x} must always be precede \texttt{y} and \texttt{z}.
-Similarly, \texttt{y}, must always appear before \texttt{z}.
+Similarly, \texttt{y} must always appear before \texttt{z}.
 
 There are several ways to achieve this ordering.
 Since the generative process is iterative, the first instantiation
@@ -771,7 +786,7 @@ Each node \texttt{n} represents a snippet within the block,
 and each directed edge $\texttt{n}_1 \to \texttt{n}_2$
 denotes that snippet $\texttt{n}_1$ depends on $\texttt{n}_1$.
 To construct a self-sufficient partition starting from a node $\texttt{n}$,
-we employ two procedures that traverse the dependency graph
+we employ two procedures that traverses the dependency graph
 to gather information regarding its topology.
 An \textit{upstream} traversal starting at \texttt{n} walks
 along every possible path \textit{ending} in \texttt{n}, in
@@ -912,12 +927,12 @@ The semantic, syntactic, and representational interfaces
 described in Sections \ref{sec:context}, \ref{sec:syntax}, and \ref{sec:repr}
 lay the foundation for more complex overarching heuristics
 to guide a generative process underlying fuzzing.
-This section explores four meta-heuristic guiding oracles shaped into
+This section explores three meta-heuristic guiding oracles shaped into
 several concrete algorithm variations and their application
 in the context of compiler fuzzing.
 Subsection \ref{subsec:random-sampling} establishes a standard baseline algorithm,
 while \Cref{subsec:diversity-ga}, and \ref{subsec:proximity-ga}
-elaborate on two more complex heursitic approaches,
+elaborate on two more complex heuristic approaches,
 centering on syntax and semantics, respectively.
 
 \subsection{\label{subsec:random-sampling} Random Sampling}
@@ -925,8 +940,8 @@ centering on syntax and semantics, respectively.
 \newacronym{RS}{RS} {Random Sampling}
 
 Perhaps the simplest method to leverage the context and grammar constructs
-is to repeatedly sample a given node in the extended grammar by traversing a
-context-informed random node path.
+is to repeatedly sample a given node in the extended grammar by traversing
+context-informed random paths.
 We refer to this generative procedure as \Gls{RS}.
 Though trivial in its scope, this approach has proven deceptively powerful
 and is the dominant search strategy employed in some shape by all state-of-the-art
@@ -967,27 +982,29 @@ all algorithms involved in this study follow.
 \end{algorithm}
 
 
-The sampling procedure takes as input a node $\mathcal{N}$, a context $\mathcal{C}$, 
+The sampling procedure takes as input a node $\mathcal{N}$ of the extended Kotlin \gls{CFG}
+, a context $\mathcal{C}$, 
 and a time budget $s$ that determines how long to run for.
-The loop simply invokes the target node's \texttt{sample} property repeatedly,
+The loop simply invokes the $\mathcal{N}$'s \texttt{sample} property repeatedly,
 generating code that is syntactically rooted in the target.
 Since this procedure mutates the provided context, the main loop creates a fresh
 clone of original context $\mathcal{C}$ to prevent cross-referencing between
 different files.
-An archive $A$ tracks and collects each generated file.
-The procedure finishes it exhausts the allotted time budget,
-and the output consists of all the generated files.
+An archive $A$ tracks and collects each generated file,
+and is returned once the allotted time has exhausted.
 
-The proven effectiveness of random sampling as a generative mechanism
-in conjunction with a \gls{BB} treatment of the target compiler
-has lead researchers to focus on developing auxiliary methods
-in support of the core random search driving mechanism.
-As a result, many of today's compiler fuzzing tools utilize heuristics to shape
+% The proven effectiveness of random sampling as a generative mechanism
+% in conjunction with a \gls{BB} treatment of the target compiler
+% has lead researchers to focus on developing auxiliary methods
+% in support of the core random search driving mechanism.
+As a result of the prevelance of \gls{RS} in conjunction with a \gls{BB} treatment of
+the compiler under test, many of today's compiler fuzzing tools utilize heuristics to shape
 the direction of stochastic sampling procedures rather than directly
-optimize solutions for these objectives.
+optimize solutions under concrete objectives.
 The remainder of this chapter explores auxiliary optimization settings,
 that seek to substitute the standard \gls{RS} procedure
-with directly measurable objectives.
+with directly measurable objective functions, as an alternative
+paradigm to unguided sampling.
 
 \subsection{\label{subsec:diversity-ga}Syntactic Diversity-Driven Search}
 
@@ -1014,8 +1031,9 @@ Once generation has concluded, the newly established block
 internally maintains a vectorized numerical representation of
 all its counters.
 This simplified representation implicitly describes a 
-coordinate space that contains every possible valid piece of Kotlin space
-(though, clearly, many semantically dissimilar pieces of code can be mapped to the same points).
+coordinate space that contains every possible valid piece of Kotlin code
+(though, clearly, this mapping is surjective as many pieces of code
+may be mapped to identical points).
 Furthermore, this syntactically-minded space largely overlooks
 the semantic nuances of the blocks that inhabit it, driving the genetic process
 almost entirely through the \gls{CFG}.
@@ -1034,12 +1052,12 @@ on the input space of all possible blocks $\mathcal{B}$ and outputs
 a $k$-dimensional vector of natural numbers representing, for each position,
 the number of language structures of a certain type present within the block.
 Using this mapping, any common measure of distance
-$d : \mathbb{N}^k \times \mathbb{N}^k \to \mathbb{R}$ may be used to determine
+$d : \mathbb{N}^k \times \mathbb{N}^k \to \mathbb{R}$ (i.e., Euclidean) may be used to determine
 the distance between two blocks.
-Within this framework, we equate the distance between two blocks to a
-simplified notion of similarity.
+Within this setting, we equate the notion of similarity
+the distance between two blocks.
 From these conventions, the notion of population-wide 
-similarity follows:
+dissimilarity follows:
 
 \begin{equation}
 dis(b, P) = min_{b^{(i)} \in P - \{ b \}} \{ d(m(b), m(b^{(i)})) \}
@@ -1047,7 +1065,7 @@ dis(b, P) = min_{b^{(i)} \in P - \{ b \}} \{ d(m(b), m(b^{(i)})) \}
 \end{equation}
 
 
-Intuitively, the similarity of a block $b$ with regard to a population
+Intuitively, the dissimilarity of a block $b$ with regard to a population
 $P$ is the minimum distance from $b$ to a different block $b^{(i)}$
 belonging to the population. 
 This notion gives rise to a population-wide diversity fitness function:
@@ -1095,7 +1113,7 @@ This notion gives rise to a population-wide diversity fitness function:
 This formulation inverts and normalizes the similarity metric, meaning that
 $f^{(SO)}_{\texttt{DIV}}$ has reached an optimum when $dis(b, P)$ has reached its maximum.
 In other words, the higher the minimum distance from a block to its population peers is,
-the higher its fitness.
+the better its fitness.
 While the notions of (dis)similarity and diversity allow for different computations,
 the one put forward in \Cref{eq:sim} fits the purposes of compiler fuzzing
 especially well.
@@ -1113,6 +1131,64 @@ dissimilar from the rest of the population.
  \newacronym{MO}{MO} {Many-Objective}
 
 \subsubsection{\label{subsec:moga}Indirect Many-Objective Diversity Optimization}
+
+Though it models the concept of inter-block syntactic similarity well,
+the \Gls{SO} optimization criterion suffers from one key limitation.
+$f^{(SO)}_{\texttt{DIV}}$ fails to faithfully depict
+the entire similarity landscape, implicitly requiring
+a trade-off in importance between similarity
+to close (or similar) and far away (or dissimilar) blocks.
+The higher the weight on the local topology, the more likely it is for the \gls{SO} formulation to "miss" the global landscape.
+The converse is also true, requiring the algorithm design to carefully strike
+a balance between the two conflicting objectives.
+Within the scope of compiler fuzzing, such a balance is very challenging to reason about,
+not least because the key to unlocking a balanced fitness criterion
+rests on many layers of abstractions and tools,
+all centered around the compiler.
+
+To overcome this limitation, we propose a second method
+of obtaining a diverse set blocks, centered around a \Gls{MO}
+interpretation of diversity. 
+Let $f_l(b) : \mathcal{B} \to \mathbb{N}, \forall l \in \mathbb{L}$ be
+a function that maps arbitrary blocks to a natural number
+equal to the number of occurrences of language construct $l$
+in the input block, with $\mathbb{L}$ the set of all valid language constructs
+of Kotlin.
+In addition, let $f_{sz}(b) : \mathcal{B} \to \mathbb{N}$ be a function
+that maps input blocks to their size.
+There are multiple sensible choices for the measurement of block size, but in this
+study we limit our measurements to a single metric that counts the number of characters
+in the text representation of the individual.
+Altogether, these functions give rise to a novel \gls{MO} objective function:
+
+\begin{equation}
+\max_{b \in \mathcal{B}} f^{(MO)}_{\texttt{DIV}}(b) = \left\lbrace -f_{sz}(b), ~f_{l_1}(b),~f_{l_2}(b),~\dots,~f_{l_n}(b)|~l_i \in \mathbb{L} \right\rbrace
+\end{equation}
+
+Within this formulation, $f^{(MO)}_{\texttt{DIV}}$ attempts to simultaneously
+\textit{maximize} the number of each language feature
+and \textit{minimize} the size of each block.
+In essence, this gives rise to a Pareto frontier of blocks
+that have a high number of different combinations sets of language features
+within a limited size.
+The size minimization is an essential ingredient to this interpretation of diversity.
+Omitting the size objective causes $f^{(MO)}_{\texttt{DIV}}$
+to simply maximize the number of each language feature independently.
+In practice, this is a poor decision for two key reasons.
+
+First, the nature of language feature objectives is strictly linear and additive.
+Since larger blocks contain more code, they also contain, by extension, more
+language features on average.
+This causes larger blocks to be (on average) much more likely
+to Pareto dominate smaller blocks and take over the population very quickly.
+This setting would heavily favor larger blocks, entirely missing
+the enveloping goal of optimization.
+Second, exploring a search space composed of smaller blocks may uncover
+more valuable compiler defects.
+Smaller blocks not only make it easier to pinpoint the cause of the
+uncovered faults, but are also more likely to lead to
+more impactful faults: the smaller the code pertaining to a compiler bug,
+the more generalizable and likely it is to appear in real-world projects.
 
 \begin{algorithm}[t]
 
@@ -1148,64 +1224,10 @@ dissimilar from the rest of the population.
 	\label{alg:modga}
 \end{algorithm}
 
-Though it models the concept of inter-block syntactic similarity well,
-the \Gls{SO} optimization criterion suffers from one key limitation.
-$f^{(SO)}_{\texttt{DIV}}$ fails to faithfully depict
-the entire similarity landscape, implicitly requiring
-a trade-off in importance between similarity
-to close (or similar) and far away (or dissimilar) blocks.
-The higher the weight on the local topology, the more likely it is for the \gls{SO} formulation to "miss" the global landscape.
-The converse is also true, requiring the the algorithm design to carefully strike
-a balance between the two conflicting objectives.
-Within the scope of compiler fuzzing, such a balance is very challenging to reason about,
-not least because the key to unlocking a balanced fitness criterion
-rests on many layers of abstractions and tools,
-all centered around the compiler.
-
-To overcome this limitation, we propose a second method
-of obtaining a diverse set blocks, centered around a \Gls{MO}
-interpretation of diversity. 
-Let $f_l(b) : \mathcal{B} \to \mathbb{N}, \forall l \in \mathbb{L}$ be a
-a function that maps arbitrary blocks to a natural number
-equal to the number of occurrences of language construct $l$
-in the input block, with $\mathbb{L}$ the set of all valid language constructs
-of Kotlin.
-In addition, let $f_{sz}(b) : \mathcal{B} \to \mathbb{N}$ be a function
-that maps input blocks to their size.
-Altogether, these functions give rise to a novel \gls{MO} objective function:
-\begin{equation}
-\max_{b \in \mathcal{B}} f^{(MO)}_{\texttt{DIV}}(b) = \left\lbrace -f_{sz}(b), ~f_{l_1}(b),~f_{l_2}(b),~\dots,~f_{l_n}(b)|~l_i \in \mathbb{L} \right\rbrace
-\end{equation}
-
-Within this formulation, $f^{(MO)}_{\texttt{DIV}}$ attempts to simultaneously
-\textit{maximize} the number of each language feature
-and \textit{minimize} the size of each block.
-In essence, this gives rise to a Pareto frontier of blocks
-that have a high number of different combinations sets of language features
-within a limited size.
-The size minimization is an essential ingredient to this interpretation of diversity.
-Omitting the size objective causes $f^{(MO)}_{\texttt{DIV}}$
-to simply maximize the number of each language feature independently.
-In practice, this is a poor decision for two key reasons.
-
-First, the nature of language feature objectives is strictly linear and additive.
-Since larger blocks contain more code, they also contain, by extension, more
-language features on average.
-This causes larger blocks to be (on average) much more likely
-to Pareto dominate smaller blocks and take over the population very quickly.
-This selection pressure directly favors more sizable blocks, entirely missing
-the enveloping goal of optimization.
-Second, exploring a search space composed of smaller blocks may uncover
-more valuable compiler defects.
-Smaller blocks not only make it easier to pinpoint the cause of the
-uncovered faults, but are also more likely to lead to
-more impactful faults: the smaller the code pertaining to a compiler bug,
-the more generalizable and likely it is to appear in real-world projects.
-
 \Cref{alg:modga} contains the pseudocode for the \gls{MO} optimization
-algorithm based on $f^{(SO)}_{\texttt{DIV}}$.
+algorithm based on $f^{(MO)}_{\texttt{DIV}}$.
 It is a straight-forward extensions of \gls{SO} \gls{GA} that utilizes
-an archive (lines 1, 5) to track the set of non-dominated solution
+an archive (lines 1, 5) to track the set of non-dominated solutions
 that together comprise the approximation set.
 With each iteration, the archive could both grow (by inserting new non-dominated
 blocks) and shrink (by discarding older individuals dominated by newer additions).
@@ -1233,8 +1255,9 @@ The algorithm returns this approximation set as its final output (line 9).
 
 Grasping implications of the different diversity formulations
 may prove tricky.
-To help understand how the selection criteria and their respective formulations
-impact the landscape of the search process, consider the example in \Cref{fig:diversity}.
+To help build intuition regarding how the selection
+criteria and their respective formulations
+impact the landscape of the search process, we provide an example in \Cref{fig:diversity}.
 Subfigure (a) shows a population of 30 points, the features of which
 were each drawn from categorical uniform distributions.
 In practice, the axes represent the number of language
@@ -1290,7 +1313,7 @@ detailed picture for comparing blocks.
 While effective as a means of measuring the structural composition of
 blocks, the syntactic diversity criteria introduced in the previous
 section fail capture the semantic nuances of generated code.
-In this subsection, we introduce a slew of techniques culminating in two
+In this subsection, we introduce a slew of techniques culminating in three
 complementary \gls{GA} formulations that seek to better
 account for the indispensable semantic dimension of Kotlin code. 
 
@@ -1513,8 +1536,7 @@ subsection.
 
 The algorithm is structured in two nested loops.
 Before iterations start, the algorithm first shuffles
-the 
-The outer loop first selects a target (line 4),
+the outer loop first selects a target (line 4),
 before attempting to optimize a random population towards that target,
 in a nested loop that applies a \gls{GA} (lines 5-11).
 In addition to running the nested \gls{GA},

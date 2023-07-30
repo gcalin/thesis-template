@@ -1,2 +1,205 @@
 \addcontentsline{toc}{part}{Part III}
 \chapter{\label{cha:discussion}Discussion}
+
+This section discusses the totality of the study and contextualizes
+potential implications.
+We begin by analyzing the limitations of our approach in \Cref{sec:limits},
+before addressing potential threats to the validity of the research in \Cref{sec:threats}.
+\Cref{sec:future} provides recommendations regarding potential 
+avenues of future expansion of this study.
+
+\section{\label{sec:limits}Limitations}
+
+Throughout this study, we generated, compiled, and analyzed
+roughly 200,000 Kotlin files, and uncovered five categories
+of defects affecting three components of the Kotlin compiler.
+The Kotlin compiler team verified all of these errors and is
+working on targeted fixes for several of them.
+In this process, several non-trivial
+underlying biases and restraints that
+\kf~carries came to light.
+In this section, we analyze both the practical and theoretical
+limitations of the fuzzer, critically assess them, and propose solutions.
+
+\paragraph{Language Features}
+The set of language features that the fuzzer currently supports is limited
+to functions, four types of expressions, and statements.
+This limitation, which we imposed to ensure the feasibility of the study,
+drastically limits the domain of code that \kf~can generate.
+In practice, this restriction means that any defects that are related to core language features,
+such as classes, are outside the reach of the current research prototype.
+Extending the set of language features is paramount for enhancing
+the practicality of the tool and for effectively exploring the Kotlin syntax.
+In its current state, extending novel language features consists of simply
+implementing either one or two additional Java classes and making them accessible
+in parent \gls{CFG} nodes.
+
+\paragraph{Context}
+Throughout the study, the root context used for sampling
+consisted of a limited collection of standard library files mostly containing exceptions,
+throwables, as well as numeric, logical, and string types.
+Besides severely limiting the number of objects and classes
+that \kf~ can generate, this factor also affects the
+set of language features that our tool can leverage.
+For instance, \texttt{for} statements in Kotlin can only be applied
+to constructs that implement specific methods, also known as \textit{container} classes.
+In the current context, no such type is available, further limiting the syntax \kf~can leverage.
+
+\paragraph{Generative Constraints}
+To ensure the validity of generated code, we embed
+numerous constraints and biases in the sampling process.
+The implementation of these constraints has proven effective,
+as all sampled code examined in this study was valid (i.e., either \texttt{K1} or \texttt{K2}
+compiled the code, unless a \texttt{OOM} error occurred).
+However, these constraints may drastically reduce the domain of code that \kf~ can generate,
+thus possibly also missing out on additional defects.
+For instance, constraints such as \textit{the return type of a function must be samplable in the current context}
+may render much of the context useless.
+While intuitively respecting such a constraint is sensible
+(if there is no way to sample a type in the current context, it is impossible to write a function
+that returns such a type), it could be that breaking this constraint
+might lead to false negative defects.
+The genetic recombination proves this by breaking one such constraint, which
+lead to the nested function defect discussed in \Cref{sec:buganalysis}.
+Exploring how generative constraints affect the quality of the generated code and whether
+they lead to additional defects requires careful and incremental changes, that we do not cover in this study.
+
+\paragraph{Representation and Genetic Operators}
+The hierarchical \textit{fragment, snippet, block} representation
+is sufficient to meaningfully separate code
+based on complexity and scope, but lacks the precision needed to
+explore certain corner cases.
+For instance, neither snippets, nor blocks are recursive,
+which means variation operators in \gls{GA} algorithms
+are only able to operate on the highest scope
+of the file.
+This limitation leaves out numerous cases in which
+code can be exchanged on smaller levels, in turn exploring a new dimension of the language.
+A representation capable of capturing this level of detail
+requires a recursive implementation of blocks and fragments,
+the foundation of which is already implemented in the current implementation of \kf.
+
+\paragraph{\gls{GA} Convergence}
+The application of \gls{GA}-based formulations to fuzzing
+raises the problem of convergence.
+Especially visible in the cases of \gls{SODGA} and \gls{STPGA},
+the problem stems from the fact that relatively stable sets of solutions
+may emerge quickly in those \gls{GA}s.
+Since longer fuzzing campaigns become wasteful and redundant in those
+scenarios, a mechanism that breaks this stability would enable
+longer fuzzing runs.
+Two options to alleviate this problem include restart mechanisms to effectively reset the search process,
+and altering the targets of proximity-based algorithms.
+
+\section{\label{sec:threats}Threats to Validity and Reproducibility}
+
+Threats to \textit{construct validity} stem from the connection between 
+the practical measures employed to quantify theoretical aspects of the study.
+In this regard, we use standard \gls{DT} procedures to quantify
+compiler defects, and link uncovered defects to static, measurable properties of
+the generated code.
+We also employ common metrics of effectiveness and efficiency that
+are standard practice throughout empirical software engineering research.
+
+Threats to \textit{internal validity} regard factors that could lead
+to confounding the causes of observed phenomena.
+We take several measures to address the large degree of randomness
+inherent to fuzzing approaches.
+First, we individually assess each uncovered defect
+and analyze the components of the fuzzer involved in its generation.
+Second, we ensure the fairness of
+the comparisons by sharing parameters
+between different configurations with
+default values from literature, where available.
+We also perform the comparison using a single implementation
+of the tool, that relies on the same sampling process and genetic operators.
+Lastly, to assess the effectiveness and efficiency of our algorithms,
+we repeat independent runs 10 times, and report average values
+that are subject to standard statistical analyses.
+
+Threats to \textit{conclusion validity} affect the relation between the available data
+and the credibility of the conclusions we derive based on it.
+To this end, we base our analysis on over 200,000 generated files,
+and vary the essential hyperparameters of our algorithms to several
+sensible values.
+We additionally perform statistical tests to compare algorithms representative
+of their respective class.
+In particular, we base our performance conclusions on
+the application of the Wilcoxon signed-rank test, which
+is a statistical procedure that does not make any assumptions
+about the distribution of the underlying data.
+
+Threats to \textit{reproducibility} concern factors that might cause the application
+of the same research methods to result in significantly divergent or conflicting observations.
+To mitigate this, we supply the entire code base that implements \kf~ \footnote{TODO, not available in draft},
+in addition to the entire set of generated files, adjacent preprocessed data, and analytics tools \footnote{TODO}.
+We also provide extensive documentation regarding our research methods (within this study),
+as well regarding our tool, its configuration, and its applicability.
+To ensure that no environmental factors interfere with the fuzzer,
+we use containerization to isolate the dependency management and runtime of \kf.
+
+\section{\label{sec:future}Future Work}
+
+On top of addressing the limitations underlined in \Cref{sec:limits} and exploring
+additional heuristics in the context of compiler fuzzing,
+there are several directions future work could follow to extend this study.
+
+\paragraph{Compiler Integration}
+The heuristic fitness
+criteria explored in this study work as methods
+to guide the generative sampling process towards
+promising areas of the Kotlin code space.
+In parallel to those methods, one could leverage compiler information
+directly into the search algorithm.
+The compiler service described in \Cref{cha:tool} provides
+an interface for this by allowing the fuzzer
+to query for files that trigger faults according to \gls{DT}.
+However, the fuzzer does not currently integrate this information into the search process.
+Integration could follow different blueprints, such as maintaining code that uncovers faults as a permanent part of the population,
+or avoiding the language features in those files as to avoid duplication.
+
+\paragraph{Defect Clustering at Runtime}
+In its current implementation, \kf~only analyzes the generated files
+after the fuzzing process has terminated.
+We perform defect analysis automatically by parsing cached compiler messages
+for common patterns, and manually analyze files that do not fit known patterns.
+Heuristically performing this task at runtime could provide additional information to the fuzzer
+in such a way that \kf~could orient the search process away from proeminent clusters,
+thus better exploring the search space.
+This process could take several forms.
+For instance, the aforementioned compiler integration could be extended
+to incorporate additional clustering capabilities.
+Additionally, the embedding process could act as a mapping
+tool that allows the application of standard clustering algorithms
+without the need for compilation.
+Both options would incur significant computational overhead in relation to \gls{RS}.
+
+\paragraph{Integration with Mutation Fuzzing} \citet{stepanov2021type} introduced
+a mutation-based fuzzer for Kotlin, that alters input code
+in a sound and type-aware manner.
+Since the variation operators currently available in \kf~are both vastly
+different and less powerful than those in the mutation fuzzer,
+exploring the integration of the two could give rise to new,
+otherwise unattainable pieces of code.
+This integration could follow a two-step approach,
+where files generated through \kf~serve as input to the mutation fuzzer.
+Alternatively, a closer integration of the two methods
+could see \kf~use the mutation fuzzer as a powerful variation operator
+implemented in one of its \gls{GA}s.
+
+\paragraph{Specialized Embeddings}
+The semantic proximity \gls{GA}s rely on embeddings to
+guide the search process.
+Throughout this study, we rely on \textsc{CodeBERT} \citet{feng2020codebert} as a
+tool for providing this critical piece of the algorithm.
+However, this choice might not be optimal.
+First, newer models have superseded \textsc{CodeBERT} on several
+\gls{ML4SE} tasks, and leveraging these newer solutions might increase
+the quality of the embeddings.
+Second, \textsc{CodeBERT} is not specifically pre-trained for Kotlin-related tasks.
+Given the recent rise in popularity of Kotlin, there is likely
+sufficient available open-source data to either pre-train
+or fine-tune a large code model specifically for Kotlin.
+In addition to increasing the quality of the embeddings,
+such a model could prove useful for many other tasks
+centered around Kotlin.

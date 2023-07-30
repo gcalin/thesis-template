@@ -17,7 +17,7 @@ required for the analysis of related work examined in Chapter \ref{cha:related}.
 %        description={A mathematical expression}
 %}
 %\Gls{formula}
-The Kotlin project began in 2010, with version \texttt{1.0} releasing
+The Kotlin project began in 2010, with version \texttt{1.0}
 officially releasing six years later \citep{stepanov2021type}.
 Following Google's decision to support it as an official Android
 programming language \cite{kotlin5years}, Kotlin's popularity increased drastically.
@@ -35,18 +35,20 @@ Such changes have not gone unnoticed by Kotlin developer
 community, who for the past seven years has introduced numerous
 changes to all parts of the language ecosystem to
 accommodate changes in the scope of the language.
-Inevitably, the compiler too must adapt to the adjustment
-in direction that the ecosystem is subject to.
+Inevitably, the compiler too must adapt to the direction that the ecosystem is taking.
 Perhaps one of the biggest changes to Kotlin as a whole
 is the upcoming release of version 2.0 of the language,
-complete with a sweeping re-write of the compiler frontend TODO citation.
+complete with a sweeping re-write of the compiler
+frontend \footnote{https://blog.jetbrains.com/kotlin/2023/02/k2-kotlin-2-0/}.
+This component is responsible for parsing, analyzing, and translating source code
+into an intermediate representation.
 
 Code-named \texttt{K2}, the new version of the compiler seeks
 to increase performance and maintain backwards compatibility,
-all while entirely replacing the architecture of the current compile frontend.
+all while entirely replacing the architecture of the current compiler frontend.
 Naturally, any defects in the new compiler implementation
-could have drastic repercussions for Kotlin users, and the
-sheer size of the rewrite warrants extensive amounts of testing.
+could have drastic repercussions for Kotlin users, which coupled with the
+sheer size of the rewrite, warrants extensive testing.
 The remainder of this study targets the testing of the new
 (experimental) implementation of the \texttt{K2} compiler
 against its previous counterpart, with the goal
@@ -54,24 +56,23 @@ of uncovering defects that the introduction of \texttt{K2} brings with it.
 
 \newacronym{JVM}{JVM} {Java Virtual Machine}
 
-Though it supports several platforms, large portions of the Kotlin ecosystem pivots around
+Though it supports several platforms, large portions of the Kotlin ecosystem pivot around
 the \Gls{JVM} system and its adjacent Java bytecode instruction set.
 Kotlin is one of several successful languages to leverage the \gls{JVM},
 together with Java, Scala, Clojure, and Groovy. 
 One can think of the \gls{JVM} as a compatibility layer
-between a Java bytecode input and a target-specific target language.
+between a Java bytecode input and a target language.
 The advantage of this system lies in the flexibility it affords
 language engineers.
-Leveraging the \gls{JVM} as an intermediate compilation step,
-language designers can focus on building a single compilation tool
+Leveraging the \gls{JVM} allows
+language designers to focus on building a single compilation tool
 that targets Java bytecode.
 This approach delegates the task of machine code
 generation to the \gls{JVM} and frees compiler engineers from
 platform- and hardware-specific idiosyncrasies.
-This study focuses on testing the end-to-end compilat1ion pipeline
+This study focuses on testing the end-to-end compilation pipeline
+on the \gls{JVM} platform
 of Kotlin through the open-source \texttt{kotlinc} utility.
-
-
 
 \newacronym{SDLC}{SDLC} {Software Development Lifecycle}
 \newacronym{SUT}{SUT} {System Under Test}
@@ -88,8 +89,9 @@ of Kotlin through the open-source \texttt{kotlinc} utility.
 Testing is an integral component of the \gls{SDLC} \cite{jamil2016software}.
 At its core, software testing is the process of validating
 the behavior of a target \gls{SUT}. 
-Over time, specialized testing approaches have emerged as
-the practice of software engineering itself matured.
+Over the years, researchers expanded vast resources into
+developing, and understanding the nuances of
+software testing, both manual and automated.
 To effectively navigate the numerous alternatives, we use the
 taxonomy established by \citet{umar2020comprehensive}.
 
@@ -129,7 +131,7 @@ requirements.
 Irrespective of access to the \gls{SUT}
 and its level of granularity, test cases must be capable
 of distinguishing between correct and faulty behavior.
-This challenge constitutes
+This challenge constitutes the
 \textit{test oracle problem}, and its automation is among the 
 greatest obstacles in automating test case generation \citep{barr2014oracle}.
 Approaches like specification inference and regression testing offer
@@ -142,7 +144,7 @@ one version of the \gls{SUT} returns a result that differs from the others.
 While inexact in its nature, \gls{DT} has become popular
 in the field of compiler testing thanks to its lightweight 
 constraints, which increase its applicability to especially complex
-pieces of software.
+pieces of software, like compiler ecosystems.
 
 \section{Automated Test Case Generation}
 
@@ -156,7 +158,7 @@ showed that test suites often evolve in tandem with their code bases.
 These findings suggest that to adequately test an evolving system,
 practitioners not only allocate significant resources to writing test cases,
 but also do so throughout the software's lifetime.
-In an effort to alleviate the human effort that testing requires,
+In an effort to alleviate the human resources that traditional compiler testing requires,
 researchers developed a plethora of automated test case generation methods.
 The remainder of this section briefly covers the most prevalent techniques
 in this field.
@@ -203,7 +205,7 @@ fundamental fuzzing paradigms:
 which they manipulate in heuristic ways to better cover that \gls{SUT}'s input space.
 The performance of these approaches is often heavily correlated
 with the quality of the corpus of seed inputs as the main source
-of expliting program knowledge.
+of exploiting program knowledge.
 
 
 \item \textbf{Generation-based fuzzers}~sample the input space
@@ -327,7 +329,8 @@ for several tasks, including unit testing
 \cite{tonella2004evolutionary, panichella2017automated},
 data flow testing \cite{girgis2005automatic}, and REST API testing
 \cite{arcuri2019restful}.
-Biology-inspired by nature, standard \gls{GA} formulations share several core ingredients:
+Inspired by the theory of natural evolution,
+standard \gls{GA} formulations share several core ingredients:
 \begin{itemize}
 \item A \textit{representation} of \textit{individuals},
 	often referred to as \textit{chromosomes}.

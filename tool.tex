@@ -18,7 +18,7 @@ that (i) enable the generation of Kotlin code,
 and (iii) can perform analysis on the performance
 and behavior of its algorithms.
 The implementation spans around 10,000 lines of code
-across five programming languages and more than dozen libraries.
+across five programming languages and more than a dozen libraries.
 In addition to providing a versatile toolkit, we aim for
 \kf~ to fulfill two other key qualities.
 
@@ -34,17 +34,17 @@ at both distributing software in isolation and building a controlled
 environment in which strict version requirements can be met.
 These properties significantly lessen the burden of modularity
 and reproducibility.
-As a result, the entire \kf~ system makes heavy use of containerization,
+As a result, the entire \kf~system makes heavy use of containerization,
 both to deliver software and to empirically assess it.
 
 \newacronym{SOA}{SOA}{Service-Oriented Architecture}
 
 \section{\label{sec:architecture}Architecture of the System}
 
-The ambitious and varied tasks that \kf~ sets out to accomplish
+The ambitious and varied tasks that \kf~sets out to accomplish
 require a versatile architecture that encourages modularity
 and extendability.
-For this reason, we design \kf~ to follow a \gls{SOA}.
+For this reason, we design \kf~to follow a \gls{SOA}.
 The service-centric model allows for the separation of
 individual tasks into self-contained components, called
 \textit{services}, that can interface with each other
@@ -121,7 +121,7 @@ sampling within this research prototype
 is limited to a functions, expressions, and statements.
 
 By default, we use the standard specification of \textsc{antlr4}
-lexer and parser grammars. \footnote{https://kotlinlang.org/docs/reference/grammar.html}
+lexer and parser grammars\footnote{https://kotlinlang.org/docs/reference/grammar.html}.
 The grammar component of the fuzzer traverses the graph representation
 of the \gls{CFG} and transforms each node into its extended counterpart
 as established in \Cref{sec:syntax}.
@@ -195,8 +195,8 @@ formulated in \Cref{subsec:proximity-ga}.
 This service contains a custom object that wraps the
 \textsc{CodeBERT} model and allows the embedding of arbitrary pieces of text.
 The text is first split and tokenized,
-before the model performs a forward part 
-on the tokens, retaining their embeddings.
+before the model performs a forward pass 
+on the tokens, retaining their only embeddings.
 To further allow the user to customize \kf, we
 do not limit the model selection to just \textsc{CodeBERT}.
 Instead, we allow the user to inject models of their choice
@@ -599,7 +599,7 @@ and adjust the resource paths accordingly.
 
 \begin{figure}
     \centering
-    \begin{minted}{text}
+    \begin{minted}{bash}
         docker run --name kotfuzz-runner -it --rm\
         -v $(pwd)/output:/output\
         -v $(pwd)/resources:/resources:ro\

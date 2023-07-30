@@ -12,6 +12,10 @@
 \usepackage{multirow}
 \usepackage{multicol}
 \usetikzlibrary{positioning,shapes.arrows,arrows.meta,shadows,backgrounds,fit}
+
+\usepackage{caption}
+% Table float box with bottom caption, box width adjusted to content
+
 %\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
 % %% The package 'algorithm' is useful, but incompatible with memoir.
 % %% Cor-Paul Bezemer / http://homes.esat.kuleuven.be/~dvherten/esatthesis.html
@@ -31,6 +35,7 @@
 \colorlet{gray2}{gray!80!black}
 \usepackage{listings}
 \usepackage{subfigure}
+
 \tikzset{XOR/.style={draw,circle,append after command={
         [shorten >=\pgflinewidth, shorten <=\pgflinewidth,]
         (\tikzlastnode.north) edge (\tikzlastnode.south)
@@ -108,10 +113,6 @@
 
 % Used in the bibliography to enable \citeauthor{citation}
 \usepackage[numbers]{natbib}
-%\usepackage{algpseudocode,algorithm,algorithmicx}
-%\usepackage{algpseudocode}
-%\usepackage{algorithm} 
-%\usepackage{algorithmicx}
 \newcommand*\DNA{\textsc{dna}}
 
 \newcommand*\Let[2]{#1 $\leftarrow$ #2}
@@ -143,7 +144,7 @@
 \author{C\u alin-Andrei Georgescu}                               % CHANGE TO YOUR NAME
 \authoremail{\url{caling@protonmail.com}}       % CHANGE TO YOUR EMAIL ADDRESS
 \birthplace{Bucharest, Romania}                % CHANGE TO YOUR BIRTH PLACE
-\studentid{123456}                              % CHANGE TO YOUR STUDENT ID
+\studentid{4794672}                              % CHANGE TO YOUR STUDENT ID
 
 % Optional for work done at a company, put this in comments if you did
 % not do your thesis work at a company

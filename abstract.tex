@@ -1,10 +1,53 @@
-This document describes the standard thesis style for the Software
-Engineering department at Delft University of Technology. The document
-and it's source are an example of the use of the standard \LaTeX{} style
-file. In addition the final appendix to this document contains a
-number of requirements and guidelines for writing a Software
-Engineering MSc thesis.
+Kotlin is a programming language best known for
+its interoperability with Java, as well as the measurable improvements it offers over it.
+Since its designation as Android's go-to language in 2019, the popularity
+and impact of Kotlin have risen greatly.
+% Hundreds of thousands of developers actively use Kotlin,
+% which is the primary language of over 1 million open-source repositories.
+Amidst this surge in popularity, the Kotlin
+developer team is working on a new version of the compiler that introduces
+sweeping changes to the ecosystem.
 
-Your thesis should either employ this style or follow it closely.
+Traditional compiler testing is a manual and laborious task
+that requires extensive developer effort and expertise.
+In an attempt to mitigate this, researchers have invested
+great resources in developing and perfecting automated compiler testing tools over the last decades.
+These approaches generate new pieces of code to test the behavior
+of compilers, which is assessed through differential testing.
+However, the usage of heuristics as guidance for the generative process
+is not well understood, and no approach that generates Kotlin code from scratch currently exists.
+
+In this thesis, we propose a novel method
+of enriching standard grammar specifications with language-targeted semantic
+context that is integrated in the sampling process.
+We structure generated code hierarchically
+and use it as the base of an evolutionary computation framework.
+% We structure the code that emerges from sampling
+% the enriched grammar structure into a hierarchical
+% representation based on scope and complexity.
+% We then use this representation as the basis
+% of an evolutionary framework that provides guidance
+% to the sampling process.
+Within this framework, we introduce two
+classes of algorithms that are novel to the field
+of compiler fuzzing, based on syntactic diversity and semantic proximity, respectively.
+% We introduce both single- and many-objective
+% formulations of both heuristics, in addition to
+% the literature-standard random sampling.
+
+We carry out an  empirical analysis spanning 200K generated Kotlin files, 
+which we analyzed through different Kotlin compiler versions.
+Our results uncovered five previously unreported categories of bugs,
+which we reported to the Kotlin compiler developer team.
+The developers verified and replicated our instances
+on the current release of the Kotlin compiler,
+and have assigned target release dates for fixes within the current
+major version of the compiler.
+The study also provides new insight into
+the effects of heuristic-specific hyperparameters such as
+expression simplicity, dissimilarity measurements, and target selection.
+% The study also shows the driving mechanisms of our algorithms
+% favor different code patterns, which in turn give rise
+% to different defects in the new Kotlin compiler.
 
 

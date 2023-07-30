@@ -1,6 +1,6 @@
 \chapter{\label{cha:related}Related Work}
 
-This chapter surveys relevant academic work within
+This chapter surveys relevant research work within
 the fields of compiler testing and fuzzing.
 Section \ref{sec:compiler_testing} examines existing
 automated compiler testing tools and their underlying rationale.
@@ -10,31 +10,32 @@ share many commonalities with compiler testing.
 
 \section{\label{sec:compiler_testing}Automated Compiler Testing}
 
-\newglossaryentry{tpg}
-{
-        name=test program generation,
-        description={A compiler testing technique
-        that generates novel valid programs
-        without relying on a pre-existing corpus}
-}
+% \newglossaryentry{tpg}
+% {
+%         name=test program generation,
+%         description={A compiler testing technique
+%         that generates novel valid programs
+%         without relying on a pre-existing corpus}
+% }
 
-\newglossaryentry{pm}
-{
-        name=program mutation,
-        description={A compiler testing technique
-        that generates alters existing programs}
-}
+% \newglossaryentry{pm}
+% {
+%         name=program mutation,
+%         description={A compiler testing technique
+%         that generates alters existing programs}
+% }
 
 Over the years, specialized testing approaches have emerged
 as tools for improving compiler reliability.
 To navigate the ample space of approaches, we adopt a simplified
 version of the taxonomy proposed by \citet{chen2020survey}. 
-Most notably, we distinguish between \gls{tpg} and \gls{pm} approaches, discussed
+Most notably, we distinguish between \textit{test program generation}
+and \textit{program mutation} approaches, discussed
 in subsections \ref{subsec:tpg} and \ref{subsec:pm}, respectively.
 The former generates programs for scratch, without any
 external seed, while the latter mutates existing programs to generate
 new variations. 
-\Gls{tpg} approaches also differ in the way in which they
+Test program generation approaches also differ in the way in which they
 utilize the grammar of the target language.
 Based on this property, \citet{chen2020survey} distinguish three
 categories.
@@ -43,12 +44,13 @@ language grammar to generate novel test cases.
 Grammar-aided approaches heuristically exploit a given
 grammar, which is often enriched with semantically
 significant context. 
-Fuzzers may not directly rely on a grammar,
+Fuzzers may also not directly rely on a grammar,
 and instead define sound heuristic that respect
 a given linguistic syntax.
 Finally, we distinguish a third, separate category of fuzzers
 that fundamentally rely on machine learning techniques to generate input.
-Since these fuzzers do not fit in with the standard taxonomy, we address them separately in
+Since these fuzzers do not fit directly
+in with the standard taxonomy, we address them separately in \Cref{subsec:ml-fuzzers}.
 
 
 \newacronym{UB}{UB} {Undefined Behavior}
@@ -76,7 +78,7 @@ that accompany \gls{CFG} specifications.
 test program generation tool aimed at finding bugs in commercial 
 C compiler using \gls{DT}.
 \textsc{Csmith} first creates a set of \texttt{struct} type
-declaration, with a stochastically-driven  number of members, which 
+declarations, with a stochastically-driven  number of members, which 
 it stores as additional information next to the C programming language grammar.
 \textsc{Csmith} then creates programs in a top-down fashion, starting from a
 single program entry point, the \texttt{main} function.

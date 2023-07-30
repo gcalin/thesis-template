@@ -1,24 +1,53 @@
-\chapter{\label{cha:conc}Conclusions and Future 
-Work}
+\chapter{\label{cha:conc}Conclusion}
 
-This chapter gives an overview of the project's contributions. After
-this overview, we will reflect on the results and draw some
-conclusions. Finally, some ideas for future work will be discussed.
+We proposed a generalizable three-pillar approach that intertwines
+grammar specification with semantic context and meta-heuristic search.
+Our method prunes semantically rich grammar productions
+and replaces them with context-aware samplable counterparts
+to drastically decrease the likelihood of generating invalid code.
+We structure the code that emerges from sampling
+the enriched grammar structure into a hierarchical
+representation based on scope and complexity.
+We then use this representation as the basis
+of an evolutionary framework that provides guidance
+to the sampling process.
 
-\section{Contributions}
+Within this evolutionary framework, we introduce two
+classes of algorithms that are novel to the field
+of compiler fuzzing.
+Syntactic diversity optimization seeks to
+drive the population toward a diverse collection of files
+that exercise different combinations of language features.
+Semantic proximity optimization aims at nudging
+the population towards a pre-defined set of targets
+using an imperfect approximation of similarity.
+To derive the similarity between
+two pieces of code, we rely on machine learning
+techniques to obtain a numerical representation
+that is the backbone of the algorithm.
+We propose and implement both single- and many-objective
+formulations of both heuristics, in addition to
+the literature-standard random sampling.
 
-\lipsum{3} % add some pseudo content
-
-
-\section{Conclusions}
-
-\lipsum{3} % add some pseudo content
-
-\section{Discussion/Reflection}
-
-\lipsum{4} % add some pseudo content
-
-\section{Future work}
-
-\lipsum{2} % add some pseudo content
+We analyzed the behavior and performance of the proposed
+approaches in an empirical analysis spanning 200,000 Kotlin files,
+which we analyzed through differential testing between the current \texttt{K1}
+compiler and the upcoming \texttt{K2} standard.
+Our results uncovered six previously unreported categories of bugs,
+five of which we reported to the Kotlin compiler developer team.
+The developers verified and replicated our instances
+on the current release of the Kotlin compiler.
+Compiler developers are working on fixing the reported issues,
+and have assigned target release dates for fixes within the current
+major version of the compiler.
+Our empirical analysis also provides new insight into
+the relations between expression simplicity and file complexity,
+distance metric and code distribution, and target selection
+and archive growth for each of the proposed heuristics.
+Finally, the performance analysis of our methods show
+that  comparable algorithms do not significantly
+differ in the number of bugs they find or the rate at which they do so.
+Despite this, the driving mechanisms of our algorithms
+favor different code patterns, which in turn materialize
+in distinct bugs uncovered by each heuristic implementation.
 
