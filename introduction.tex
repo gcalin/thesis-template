@@ -1,4 +1,4 @@
-\addcontentsline{toc}{part}{Part I}
+% \addcontentsline{toc}{part}{Part I}
 \chapter{\label{cha:intro}Introduction}
 
 Compilers are ubiquitous and pivotal components
@@ -201,8 +201,9 @@ end-to-end automated fuzzing of the Kotlin compiler,
 implementing the three proposed approaches.
 	\item Empirical analyses comparing the bug finding capabilities
 and heuristic-driven behavior of the three novel fuzzing algorithms.
-	\item A replication package containing open-source artifacts, and analytics tools
-for validating, verifying, and extending the current study.
+	\item A set of open-source artifacts, and analytics tools
+for validating, verifying, and extending the current study. 
+Artefacts include the code implementing the proposed approach \cite{kotfuzz-impl} and the data that we base the empirical study upon \cite{kotfuzz-data}.
 \end{enumerate}
 
 From a theoretical perspective, we investigate the applicability
@@ -220,28 +221,26 @@ when developing novel features in future versions of the language.
 
 \section{Overview of the Study}
 
-This thesis consists of eight additional chapters split between in three main parts.
-Part I consists of Chapters \ref{cha:background} and \ref{cha:related}, and
-provides an overview of the relevant body of knowledge and literature.
+% This thesis consists of eight additional chapters split between in three main parts.
+% Part I consists of Chapters \ref{cha:background} and \ref{cha:related}, and
+% provides an overview of the relevant body of knowledge and literature.
 Chapter \ref{cha:background} introduces the theoretical background
 that constitutes the foundation of this study.
 Chapter \ref{cha:related} discusses related work and positions this
 thesis within the current research landscape.
-
-Part II encompasses Chapters \ref{cha:algorithm}, through \ref{cha:results}
-and details the main contributions of this thesis. 
+% Part II encompasses Chapters \ref{cha:algorithm}, through \ref{cha:results}
+% and details the main contributions of this thesis. 
 Chapter \ref{cha:algorithm} describes the conceptual outline of
 the fuzzing procedure and the rationale behind its
 underpinning design choices.
-Chapter \ref{cha:tool} delineates the prototypical implementation
+Chapter \ref{cha:tool} delineates the implementation
 of our tool and highlights its practical applications.
 Chapter \ref{cha:study} outlines the design of the empirical
 study carried out to evaluate the performance of our tool.
 Chapter \ref{cha:results} analyzes the results of the empirical study
 and ties them to the main research questions.
-
-Part III includes Chapters \ref{cha:discussion} and \ref{cha:conc} 
-and reflects upon the outcomes of this study.
+% Part III includes Chapters \ref{cha:discussion} and \ref{cha:conc} 
+% and reflects upon the outcomes of this study.
 Chapter \ref{cha:discussion} discusses the main 
 findings of this research, its limitations, and makes additional recommendations for future research.
 Finally, Chapter \ref{cha:conc} concludes the thesis.

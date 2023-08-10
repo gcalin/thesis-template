@@ -1,4 +1,4 @@
-\addcontentsline{toc}{part}{Part III}
+% \addcontentsline{toc}{part}{Part III}
 \chapter{\label{cha:discussion}Discussion}
 
 This section discusses the totality of the study and contextualizes
@@ -131,10 +131,10 @@ about the distribution of the underlying data.
 
 Threats to \textit{reproducibility} concern factors that might cause the application
 of the same research methods to result in significantly divergent or conflicting observations.
-To mitigate this, we supply the entire code base that implements \kf~ \footnote{TODO, not available in draft},
-in addition to the entire set of generated files, adjacent preprocessed data, and analytics tools \footnote{TODO}.
-We also provide extensive documentation regarding our research methods (within this study),
-as well regarding our tool, its configuration, and its applicability.
+To mitigate this, we supply the entire code base that implements \kf~ \cite{kotfuzz-impl},
+in addition to the entire set of generated files and adjacent preprocessed data \cite{kotfuzz-data}.
+We also provide extensive documentation
+to detail our tool, its configuration, and its applicability.
 To ensure that no environmental factors interfere with the fuzzer,
 we use containerization to isolate the dependency management and runtime of \kf.
 
@@ -156,7 +156,10 @@ an interface for this by allowing the fuzzer
 to query for files that trigger faults according to \gls{DT}.
 However, the fuzzer does not currently integrate this information into the search process.
 Integration could follow different blueprints, such as maintaining code that uncovers faults as a permanent part of the population,
-or avoiding the language features in those files as to avoid duplication.
+or avoiding generating novel blocks that resemble
+known faulty code.
+The promotes generating more instances of the same bug,
+while the latter prevents it.
 
 \paragraph{Defect Clustering at Runtime}
 In its current implementation, \kf~only analyzes the generated files

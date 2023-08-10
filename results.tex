@@ -7,10 +7,11 @@ To achieve this goal, this chapter seeks to answer the research questions posed 
 We structure the analysis of the results as to mirror the hierarchy
 of research questions.
 \Cref{sec:resrq1} analyzes the effect of the the most impactful
-hyperparameters and the ramifications on the generative heuristics.
+hyperparameters on the generative heuristics.
 \Cref{sec:resrq2} details the performance of the best representative
 of each heuristic category.
-\Cref{sec:buganalysis} 
+\Cref{sec:buganalysis} concludes this section by highlighting individual
+bugs \kf~automatically uncovered an analyzing their origins.
 
 \section{\label{sec:resrq1}Influence of Guidance Parameters}
 
@@ -67,7 +68,7 @@ Values attached to biases between the two extremes follow the same trend,
 with 2,799, 4,712, and 6,218 files generated for simplicity biases of
 0.45, 0.50, and 0.55, respectively.
 Both rates of change significantly outpace their linear equivalents for the entire testes interval.
-In isolated cases (first interval for subfigure (a), first two intervals for subfigure (b)),
+In the first first two intervals for both subfigures,
 the rate of change also surpasses its geometric counterpart.
 
 To further understand the variability of random sampling, we consider
@@ -138,11 +139,11 @@ of file sizes that each value entails.
 \gls{RS} with a simplicity bias of 0.40 generates 15 \gls{OOM}-inducing
 files, while higher values of 0.45 and 0.50 both produce 3 such instances.
 Simplicity bias values exceeding 0.50 do not generate such files,
-correlating with their narrower file size distribution.
+due to their narrower file size distribution.
 
 \begin{center}
     \fbox{
-        \begin{minipage}{26em}
+        \begin{minipage}{32em}
             \textbf{Summary RQ1.1}: Lower simplicity bias values cause \gls{RS}
             to generate significantly larger and significantly fewer files,
             given the same computational budget.
